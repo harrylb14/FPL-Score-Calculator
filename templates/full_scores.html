@@ -9,9 +9,9 @@
     <tbody>
         {% for record in records %}
         <tr>
-            <!-- {% for col in colnames %} -->
-            <td>{{ record[0] }}</td>
-            <!-- {% endfor %} -->
+            {% for col in colnames %}
+            <td>{{ record[col] }}</td>
+            {% endfor %}
         </tr>
         {% endfor %}
     </tbody>

@@ -1,13 +1,9 @@
-from flask import Flask 
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
 @app.route("/", methods=['GET', 'POST', 'PUT'])
 def home():
-    return "<html>\
-                <body>\
-                    <h1> Hi there, Fellas! </h1>\
-                </body>\
-            </html>"
+    return render_template('index.html')
 
 app.run(debug = True)

@@ -1,0 +1,18 @@
+<table border="1">
+    <thead>
+        <tr>
+            {% for col in colnames %}
+            <th>{{ col }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in records %}
+        <tr>
+            <!-- {% for col in colnames %} -->
+            <td>{{ record[0] }}</td>
+            <!-- {% endfor %} -->
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

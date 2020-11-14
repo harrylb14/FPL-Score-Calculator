@@ -68,15 +68,40 @@ def display_all_week_scores():
     week_scores = group_scores_by_week()
     colnames = week_scores[0].keys()
     totals = calculate_total_scores()
-    print(totals)
+    points = calculate_points()
+    number_of_weeks = len(week_scores)
 
-    return render_template('full_scores.html', records=week_scores, colnames=colnames, totals=totals)
+    return render_template('full_scores.html', records=week_scores, colnames=colnames, totals=totals, points=points, number_of_weeks=number_of_weeks)
 
 def calculate_total_scores():
     scores = group_scores_by_week()
     total_scores = dict(functools.reduce(operator.add, 
          map(collections.Counter, scores))) 
     del total_scores['GameWeek']
+    return total_scores
+
+def calculate_points():
+    scores = group_scores_by_week()
+    weekly_scores = [
+        sorted([(v, k[:-6]) for k, v in week.items() if k[-6:] == " Score"], reverse=True)
+        for week in scores
+    ]
+    total_scores = defaultdict(int)
+
+    for week in weekly_scores:
+        total_scores[week[0][1]] += ( #total_scores[name] += score
+            2 if week[0][0] > week[1][0]
+            else 1.5
+        )
+        total_scores[week[1][1]] += (
+            1.5 if week[0][0] == week[1][0]
+            else 1 if week[1][0] > week[2][0]
+            else 0.5
+        )
+        total_scores[week[2][1]] += (
+            0.5 if week[1][0] == week[2][0]
+            else 0
+        )
     return total_scores
 
 app.run(debug = True)

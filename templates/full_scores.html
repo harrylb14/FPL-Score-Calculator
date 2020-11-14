@@ -20,5 +20,17 @@
             <td>{{ score }} </td>
             {% endfor %}
         </tr>
+        <tr>
+            <td> <b> Points: </b></td>
+            {% for player, score in points.items() %}
+            <td>{{ score }} </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td> <b> Net Winnings: </b></td>
+            {% for player, score in points.items() %}
+            <td>£{{ score - number_of_weeks }} </td>
+            {% endfor %}
+        </tr>
     </tbody>
 </table>

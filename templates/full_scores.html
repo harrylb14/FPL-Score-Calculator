@@ -22,14 +22,14 @@
         </tr>
         <tr>
             <td> <b> Player Points: </b></td>
-            {% for player, score in points.items() %}
-            <td>{{ score }} </td>
+            {% for name in scorenames %}          
+                <td>{{ points[name] }} </td>
             {% endfor %}
         </tr>
         <tr>
             <td> <b> Net Winnings: </b></td>
-            {% for player, cash in winnings.items() %}
-            <td>{{ cash }} </td>
+            {% for name in scorenames %}  
+                <td>{{ winnings[name] }} </td>
             {% endfor %}
         </tr>
     </tbody>

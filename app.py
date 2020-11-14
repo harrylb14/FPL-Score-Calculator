@@ -12,17 +12,18 @@ import operator
 app = Flask(__name__)
 
 def get_player_data():
-    players = [
-        {'name': 'JH', 'team_id': '258789'},
-        {'name': 'Harry', 'team_id': '278724'},
-        {'name': 'Alex', 'team_id': '422587'}
-    ]
-
     # players = [
-    #     {'name': 'Muks(muks)', 'team_id': '4451140'},
+    #     {'name': 'JH', 'team_id': '258789'},
     #     {'name': 'Harry', 'team_id': '278724'},
-    #     {'name': 'TomT', 'team_id': '128932'}
+    #     {'name': 'Alex', 'team_id': '422587'}
     # ]
+
+    players = [
+        {'name': 'Muks(muks)', 'team_id': '4451140'},
+        {'name': 'Harry', 'team_id': '278724'},
+        {'name': 'TomT', 'team_id': '128932'},
+        {'name': 'JB', 'team_id': '234477'} 
+    ]
     
     for player in players:
         team_id = player['team_id']
@@ -66,12 +67,13 @@ def home():
 @app.route("/scores", methods=['GET', 'POST', 'PUT'])
 def display_all_week_scores():
     week_scores = group_scores_by_week()
-    colnames = week_scores[0].keys()
+    colnames = [*(week_scores[0].keys())]
+    scorenames = colnames[1:]
     totals = calculate_total_scores()
-    points = calculate_points()
-    winnings = calculate_winnings()
+    points = dict(calculate_points())
+    winnings = dict(calculate_winnings())
 
-    return render_template('full_scores.html', records=week_scores, colnames=colnames, totals=totals, points=points, winnings=winnings)
+    return render_template('full_scores.html', records=week_scores, colnames=colnames, scorenames=scorenames, totals=totals, points=points, winnings=winnings)
 
 def calculate_total_scores():
     scores = group_scores_by_week()
@@ -86,9 +88,9 @@ def calculate_winnings():
     winnings = {}
     for player, score in points.items():
         score = score - number_of_weeks
-        if score > 1:
+        if score >= 1:
             cash_score = "£{:,.2f}".format(score)
-        elif abs(score) > 1:
+        elif abs(score) >= 1:
             cash_score = "-£{:,.2f}".format(abs(score))
         else:
             cash_score = f"{int(score*100)}p"
@@ -99,8 +101,9 @@ def calculate_winnings():
 
 def calculate_points():
     scores = group_scores_by_week()
+    
     weekly_scores = [
-        sorted([(v, k[:-6]) for k, v in week.items() if k[-6:] == " Score"], reverse=True)
+        sorted([(v, k) for k, v in week.items() if k[-6:] == " Score"], reverse=True)
         for week in scores
     ]
     total_scores = defaultdict(int)

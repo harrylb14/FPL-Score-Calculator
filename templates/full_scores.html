@@ -21,16 +21,24 @@
             {% endfor %}
         </tr>
         <tr>
-            <td> <b> Points: </b></td>
+            <td> <b> Player Points: </b></td>
             {% for player, score in points.items() %}
             <td>{{ score }} </td>
             {% endfor %}
         </tr>
         <tr>
             <td> <b> Net Winnings: </b></td>
-            {% for player, score in points.items() %}
-            <td>£{{ score - number_of_weeks }} </td>
+            {% for player, cash in winnings.items() %}
+            <td>{{ cash }} </td>
             {% endfor %}
         </tr>
     </tbody>
 </table>
+<br>
+<i> Player points are allocated weekly as:
+    <ul>
+        <li> 2 for a win (1.5 if its drawn) </li>
+        <li> 1 for second place (0.5 if its drawn) </li>
+        <li> 0 otherwise </li>
+    </ul>
+</i>

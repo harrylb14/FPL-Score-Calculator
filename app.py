@@ -69,9 +69,9 @@ def display_all_week_scores():
     colnames = week_scores[0].keys()
     totals = calculate_total_scores()
     points = calculate_points()
-    number_of_weeks = len(week_scores)
+    winnings = calculate_winnings()
 
-    return render_template('full_scores.html', records=week_scores, colnames=colnames, totals=totals, points=points, number_of_weeks=number_of_weeks)
+    return render_template('full_scores.html', records=week_scores, colnames=colnames, totals=totals, points=points, winnings=winnings)
 
 def calculate_total_scores():
     scores = group_scores_by_week()
@@ -79,6 +79,23 @@ def calculate_total_scores():
          map(collections.Counter, scores))) 
     del total_scores['GameWeek']
     return total_scores
+
+def calculate_winnings():
+    points = calculate_points()
+    number_of_weeks = len(group_scores_by_week())
+    winnings = {}
+    for player, score in points.items():
+        score = score - number_of_weeks
+        if score > 1:
+            cash_score = "£{:,.2f}".format(score)
+        elif abs(score) > 1:
+            cash_score = "-£{:,.2f}".format(abs(score))
+        else:
+            cash_score = f"{int(score*100)}p"
+        score = cash_score
+        winnings[player] = cash_score
+
+    return winnings
 
 def calculate_points():
     scores = group_scores_by_week()

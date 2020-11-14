@@ -4,12 +4,12 @@ import pandas as pd
 import numpy as np
 import logging
 from collections import defaultdict
+import collections 
+import functools 
+import operator 
+
 
 app = Flask(__name__)
-
-@app.route("/", methods=['GET', 'POST', 'PUT'])
-def home():
-    return render_template('index.html')
 
 def get_player_data():
     players = [
@@ -18,6 +18,12 @@ def get_player_data():
         {'name': 'Alex', 'team_id': '422587'}
     ]
 
+    # players = [
+    #     {'name': 'Muks(muks)', 'team_id': '4451140'},
+    #     {'name': 'Harry', 'team_id': '278724'},
+    #     {'name': 'TomT', 'team_id': '128932'}
+    # ]
+    
     for player in players:
         team_id = player['team_id']
         url = f'https://fantasy.premierleague.com/api/entry/{team_id}/history/'
@@ -53,11 +59,24 @@ def group_scores_by_week():
 
     return scores_grouped_by_week
 
+@app.route("/", methods=['GET', 'POST', 'PUT'])
+def home():
+    return render_template('index.html')
+
 @app.route("/scores", methods=['GET', 'POST', 'PUT'])
 def display_all_week_scores():
     week_scores = group_scores_by_week()
     colnames = week_scores[0].keys()
-    print(colnames)
-    return render_template('full_scores.html', records=week_scores, colnames=colnames)
+    totals = calculate_total_scores()
+    print(totals)
+
+    return render_template('full_scores.html', records=week_scores, colnames=colnames, totals=totals)
+
+def calculate_total_scores():
+    scores = group_scores_by_week()
+    total_scores = dict(functools.reduce(operator.add, 
+         map(collections.Counter, scores))) 
+    del total_scores['GameWeek']
+    return total_scores
 
 app.run(debug = True)

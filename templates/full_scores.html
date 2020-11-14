@@ -14,5 +14,11 @@
             {% endfor %}
         </tr>
         {% endfor %}
+        <tr>
+            <td> <b> Total: </b></td>
+            {% for player, score in totals.items() %}
+            <td>{{ score }} </td>
+            {% endfor %}
+        </tr>
     </tbody>
 </table>

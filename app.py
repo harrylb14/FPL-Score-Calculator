@@ -28,21 +28,22 @@ def player_scores():
         for week in data:
             player_scores.append(week['points'] - week['event_transfers_cost'])
         all_player_scores.append(player_scores)
-    print(all_player_scores)
+   
     return all_player_scores
 
-@app.route("/scores", methods=['GET', 'POST', 'PUT'])
 def get_week_scores():
     all_player_scores = player_scores()
-    array_of_week_scores = map(list, zip(*all_player_scores))
-    print(array_of_week_scores)
-    dataframe=pd.DataFrame(all_player_scores, columns=['GameWeek', 'JH Score', 'Haz Score', 'Alex Score'])  
-    return dataframe
+    array_of_week_scores = list(map(list, zip(*all_player_scores)))
+    return array_of_week_scores 
+
+@app.route("/scores", methods=['GET', 'POST', 'PUT'])
+def display_all_week_scores():
+    week_scores = get_week_scores()
+    # dataframe=pd.DataFrame(all_player_scores, columns=['GameWeek', 'JH Score', 'Haz Score', 'Alex Score'])  
+    # return dataframe
 
 
 
     # return render_template('full_scores.html', records=player_scores, colnames=['GameWeek', 'JH Score', 'Haz Score', 'Alex Score'])
-
-
 
 app.run(debug = True)

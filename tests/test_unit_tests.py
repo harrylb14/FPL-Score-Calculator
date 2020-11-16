@@ -1,7 +1,9 @@
 import requests
-from app import app, get_player_data
+import sys
+from app.app import app, get_player_data
 
 base_fpl_url = 'https://fantasy.premierleague.com/api/entry'
+
 def test_index():
     tester = app.test_client()
     response = tester.get("/", content_type="html/text")
@@ -15,4 +17,4 @@ def test_get_player_data(requests_mock):
 
     assert resp == [{'name': 'Test', 'team_id': '111111', 'data': {'data': 'mock_data'}}]
 
-
+# def test_get_player_scores():

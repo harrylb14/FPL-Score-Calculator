@@ -24,8 +24,7 @@ player_list = [
     #     {'name': 'TomT', 'team_id': '128932'},
     #     {'name': 'JB', 'team_id': '234477'} 
     # ]
-def get_player_data(players):
-    
+def get_player_data(players): 
     for player in players:
         team_id = player['team_id']
         url = f'{fpl_api_base_url}{team_id}/history/'

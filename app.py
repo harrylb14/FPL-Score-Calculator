@@ -11,19 +11,19 @@ import operator
 
 app = Flask(__name__)
 
-def get_player_data():
-    players = [
+player_list = [
         {'name': 'JH', 'team_id': '258789'},
         {'name': 'Harry', 'team_id': '278724'},
         {'name': 'Alex', 'team_id': '422587'}
     ]
 
-    # players = [
+  # players = [
     #     {'name': 'Muks(muks)', 'team_id': '4451140'},
     #     {'name': 'Harry', 'team_id': '278724'},
     #     {'name': 'TomT', 'team_id': '128932'},
     #     {'name': 'JB', 'team_id': '234477'} 
     # ]
+def get_player_data(players):
     
     for player in players:
         team_id = player['team_id']
@@ -36,7 +36,7 @@ def get_player_data():
     return players
 
 def get_player_scores():
-    players = get_player_data()
+    players = get_player_data(player_list)
     all_player_scores = []
 
     for player in players:
@@ -73,7 +73,8 @@ def display_all_week_scores():
     points = dict(calculate_points())
     winnings = dict(calculate_winnings())
 
-    return render_template('full_scores.html', records=week_scores, colnames=colnames, scorenames=scorenames, totals=totals, points=points, winnings=winnings)
+    return render_template('full_scores.html', records=week_scores, colnames=colnames, 
+        scorenames=scorenames, totals=totals, points=points, winnings=winnings)
 
 def calculate_total_scores():
     scores = group_scores_by_week()
@@ -123,4 +124,5 @@ def calculate_points():
         )
     return total_scores
 
-app.run(debug = True)
+if __name__ == "__main__":
+    app.run(debug = True)

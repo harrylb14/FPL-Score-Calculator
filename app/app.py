@@ -1,8 +1,5 @@
 from flask import Flask, render_template
 import requests
-import pandas as pd
-import numpy as np
-import logging
 from collections import defaultdict
 import collections 
 import functools 
@@ -35,8 +32,8 @@ def get_player_data(players):
 
     return players
 
-def get_player_scores():
-    players = get_player_data(player_list)
+def get_player_scores(player_data = get_player_data(player_list)):
+    players = player_data
     all_player_scores = []
 
     for player in players:
@@ -45,11 +42,11 @@ def get_player_scores():
         for week in player['data']:
             player_scores.append({'GameWeek': week['event'], f'{name} Score': (week['points'] - week['event_transfers_cost'])})
         all_player_scores.append(player_scores)
-
+   
     return all_player_scores
 
-def group_scores_by_week():
-    all_player_scores = get_player_scores()
+def group_scores_by_week(scores = get_player_scores()):
+    all_player_scores = scores
     array_of_week_scores = list(map(list, zip(*all_player_scores)))
     scores_grouped_by_week = []
     for gmwks in array_of_week_scores:
@@ -70,17 +67,18 @@ def display_all_week_scores():
     colnames = [*(week_scores[0].keys())]
     scorenames = colnames[1:]
     totals = calculate_total_scores()
-    points = dict(calculate_points())
+    points = calculate_points()
     winnings = dict(calculate_winnings())
 
     return render_template('full_scores.html', records=week_scores, colnames=colnames, 
         scorenames=scorenames, totals=totals, points=points, winnings=winnings)
 
-def calculate_total_scores():
-    scores = group_scores_by_week()
+def calculate_total_scores(scores = group_scores_by_week()):
+    scores = scores
     total_scores = dict(functools.reduce(operator.add, 
          map(collections.Counter, scores))) 
     del total_scores['GameWeek']
+
     return total_scores
 
 def calculate_winnings():
@@ -99,8 +97,8 @@ def calculate_winnings():
 
     return winnings
 
-def calculate_points():
-    scores = group_scores_by_week()
+def calculate_points(scores = group_scores_by_week()):
+    scores = scores
     
     weekly_scores = [
         sorted([(v, k) for k, v in week.items() if k[-6:] == " Score"], reverse=True)
@@ -122,7 +120,8 @@ def calculate_points():
             0.5 if week[1][0] == week[2][0]
             else 0
         )
-    return total_scores
+    print(total_scores)
+    return dict(total_scores)
 
 if __name__ == "__main__":
     app.run(debug = True)

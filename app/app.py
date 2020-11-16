@@ -120,7 +120,7 @@ def calculate_points(scores = group_scores_by_week()):
             0.5 if week[1][0] == week[2][0]
             else 0
         )
-    print(total_scores)
+
     return dict(total_scores)
 
 if __name__ == "__main__":

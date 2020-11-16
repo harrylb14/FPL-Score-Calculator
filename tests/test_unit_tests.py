@@ -1,14 +1,7 @@
 import requests
-import sys
 from app.app import *
 
 base_fpl_url = 'https://fantasy.premierleague.com/api/entry'
-
-def test_index():
-    tester = app.test_client()
-    response = tester.get("/", content_type="html/text")
-    assert response.status_code == 200
-    assert 'Hi there, Fellas!' in str(response.data)
 
 def test_get_player_data(requests_mock):
     test_player = [{'name': 'Test', 'team_id': '111111'}]

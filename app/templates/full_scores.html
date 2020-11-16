@@ -1,4 +1,9 @@
-<table border="1">
+<html>
+<head>
+    <title>FPL Scores</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/scores.css') }}">
+  </head>
+<table border="1" class="center">
     <thead>
         <tr>
             {% for col in colnames %}
@@ -42,3 +47,4 @@
         <li> 0 otherwise </li>
     </ul>
 </i>
+</html>

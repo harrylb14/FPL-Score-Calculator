@@ -11,6 +11,7 @@ import operator
 
 app = Flask(__name__)
 
+fpl_api_base_url = 'https://fantasy.premierleague.com/api/entry/'
 player_list = [
         {'name': 'JH', 'team_id': '258789'},
         {'name': 'Harry', 'team_id': '278724'},
@@ -27,7 +28,7 @@ def get_player_data(players):
     
     for player in players:
         team_id = player['team_id']
-        url = f'https://fantasy.premierleague.com/api/entry/{team_id}/history/'
+        url = f'{fpl_api_base_url}{team_id}/history/'
         r = requests.get(url)
         json = r.json()
         data = json['current']

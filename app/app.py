@@ -30,7 +30,7 @@ def get_player_data(players):
         json = r.json()
         data = json['current']
         player['data'] = data
-
+    
     return players
 
 def get_player_scores(player_data):
@@ -85,21 +85,6 @@ def calculate_total_scores(scores):
 
     return total_scores
 
-def calculate_winnings(points, number_of_weeks):
-    number_of_weeks = number_of_weeks
-    winnings = {}
-    for player, score in points.items():
-        score = score - number_of_weeks
-        if score >= 1:
-            cash_score = "£{:,.2f}".format(score)
-        elif abs(score) >= 1:
-            cash_score = "-£{:,.2f}".format(abs(score))
-        else:
-            cash_score = f"{int(score*100)}p"
-        winnings[player] = cash_score
-
-    return dict(winnings)
-
 def calculate_points(scores, winning_points = 2, second_points = 1):
     scores = scores
     draw_win_points = (winning_points + second_points)/2
@@ -127,6 +112,21 @@ def calculate_points(scores, winning_points = 2, second_points = 1):
         )
 
     return dict(total_scores)
+
+def calculate_winnings(points, number_of_weeks):
+    number_of_weeks = number_of_weeks
+    winnings = {}
+    for player, score in points.items():
+        score = score - number_of_weeks
+        if score >= 1:
+            cash_score = "£{:,.2f}".format(score)
+        elif abs(score) >= 1:
+            cash_score = "-£{:,.2f}".format(abs(score))
+        else:
+            cash_score = f"{int(score*100)}p"
+        winnings[player] = cash_score
+
+    return dict(winnings)
 
 if __name__ == "__main__":
     app.run(debug = True)

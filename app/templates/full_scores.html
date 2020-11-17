@@ -1,45 +1,46 @@
-<html>
-<head>
-    <title>FPL Scores</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/scores.css') }}">
-  </head>
-<table border="1" class="center">
-    <thead>
-        <tr>
-            {% for col in colnames %}
-            <th>{{ col }}</th>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <table>
+        <thead>
+            <tr>
+                {% for col in colnames %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                {% for col in colnames %}
+                <td>{{ record[col] }}</td>
+                {% endfor %}
+            </tr>
             {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for record in records %}
-        <tr>
-            {% for col in colnames %}
-            <td>{{ record[col] }}</td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-        <tr>
-            <td> <b> Total: </b></td>
-            {% for player, score in totals.items() %}
-            <td>{{ score }} </td>
-            {% endfor %}
-        </tr>
-        <tr>
-            <td> <b> Player Points: </b></td>
-            {% for name in scorenames %}          
-                <td>{{ points[name] }} </td>
-            {% endfor %}
-        </tr>
-        <tr>
-            <td> <b> Net Winnings: </b></td>
-            {% for name in scorenames %}  
-                <td>{{ winnings[name] }} </td>
-            {% endfor %}
-        </tr>
-    </tbody>
-</table>
+            <tr>
+                <td> <b> Total: </b></td>
+                {% for player, score in totals.items() %}
+                <td>{{ score }} </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td> <b> Player Points: </b></td>
+                {% for name in scorenames %}          
+                    <td>{{ points[name] }} </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td> <b> Net Winnings: </b></td>
+                {% for name in scorenames %}  
+                    <td>{{ winnings[name] }} </td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+</div>
 <br>
+<div class="text">
 <i> Player points are allocated weekly as:
     <ul>
         <li> 2 for a win (1.5 if its drawn) </li>
@@ -47,4 +48,5 @@
         <li> 0 otherwise </li>
     </ul>
 </i>
-</html>
+</div>
+{% endblock %}

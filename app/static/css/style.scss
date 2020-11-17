@@ -1,0 +1,94 @@
+h1.Greeting {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+}
+
+a.button {
+    background: linear-gradient(45deg, #49a09d, #5f2c82);
+    box-shadow: 0 5px 0 rgb(27, 2, 68);
+    color: white;
+    padding: 1em 1.5em;
+    position: absolute;
+    text-decoration: none;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -20%);
+    border-radius: 15px;
+}
+  
+.button:hover {
+    background: linear-gradient(45deg, #295c5a, #3b1b50);
+    cursor: pointer;
+}
+  
+.button:active {
+    box-shadow: none;
+ }
+
+body {
+  height: 100%;
+  width: 100%
+}
+body {
+  margin: 0;
+  height:100%;
+  background: linear-gradient(45deg, #49a09d, #5f2c82);
+  font-family: sans-serif;
+  font-weight: 100;
+}
+.container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+table {
+  width: 800px;
+  border-collapse: collapse;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+th,
+td {
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+th {
+  text-align: center;
+}
+thead th {
+  background-color: #55608f;
+}
+tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+tbody td {
+  position: relative;
+  text-align: center;
+}
+
+tbody td:hover:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -9999px;
+  bottom: -9999px;
+  background-color: rgba(255, 255, 255, 0.2);
+  z-index: -1;
+}
+
+.text {
+	width:40%;
+    height:200px;
+	top: 600px;
+	left: 40%;
+	position: relative;
+	font-family: sans-serif;
+	font-weight: 100;
+  }

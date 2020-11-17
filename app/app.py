@@ -4,6 +4,7 @@ from collections import defaultdict
 import collections 
 import functools 
 import operator 
+import sys
 
 
 app = Flask(__name__)
@@ -32,7 +33,7 @@ def get_player_data(players):
 
     return players
 
-def get_player_scores(player_data = get_player_data(player_list)):
+def get_player_scores(player_data):
     players = player_data
     all_player_scores = []
 
@@ -45,7 +46,7 @@ def get_player_scores(player_data = get_player_data(player_list)):
    
     return all_player_scores
 
-def group_scores_by_week(scores = get_player_scores()):
+def group_scores_by_week(scores):
     all_player_scores = scores
     array_of_week_scores = list(map(list, zip(*all_player_scores)))
     scores_grouped_by_week = []
@@ -63,17 +64,19 @@ def home():
 
 @app.route("/scores", methods=['GET', 'POST', 'PUT'])
 def display_all_week_scores():
-    week_scores = group_scores_by_week()
+    data = get_player_data(player_list)
+    scores = get_player_scores(data)
+    week_scores = group_scores_by_week(scores)
     colnames = [*(week_scores[0].keys())]
     scorenames = colnames[1:]
-    totals = calculate_total_scores()
-    points = calculate_points()
-    winnings = dict(calculate_winnings())
+    totals = calculate_total_scores(week_scores)
+    points = calculate_points(week_scores)
+    winnings = dict(calculate_winnings(week_scores))
 
     return render_template('full_scores.html', records=week_scores, colnames=colnames, 
         scorenames=scorenames, totals=totals, points=points, winnings=winnings)
 
-def calculate_total_scores(scores = group_scores_by_week()):
+def calculate_total_scores(scores):
     scores = scores
     total_scores = dict(functools.reduce(operator.add, 
          map(collections.Counter, scores))) 
@@ -81,9 +84,9 @@ def calculate_total_scores(scores = group_scores_by_week()):
 
     return total_scores
 
-def calculate_winnings():
+def calculate_winnings(scores):
     points = calculate_points()
-    number_of_weeks = len(group_scores_by_week())
+    number_of_weeks = len(scores)
     winnings = {}
     for player, score in points.items():
         score = score - number_of_weeks
@@ -97,7 +100,7 @@ def calculate_winnings():
 
     return winnings
 
-def calculate_points(scores = group_scores_by_week()):
+def calculate_points(scores):
     scores = scores
     
     weekly_scores = [

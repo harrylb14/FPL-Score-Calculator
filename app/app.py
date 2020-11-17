@@ -10,18 +10,18 @@ import sys
 app = Flask(__name__)
 
 fpl_api_base_url = 'https://fantasy.premierleague.com/api/entry/'
-player_list = [
-        {'name': 'JH', 'team_id': '258789'},
-        {'name': 'Harry', 'team_id': '278724'},
-        {'name': 'Alex', 'team_id': '422587'}
-    ]
+# player_list = [
+#     {'name': 'JH', 'team_id': '258789'},
+#     {'name': 'Harry', 'team_id': '278724'},
+#     {'name': 'Alex', 'team_id': '422587'}
+# ]
 
-  # players = [
-    #     {'name': 'Muks(muks)', 'team_id': '4451140'},
-    #     {'name': 'Harry', 'team_id': '278724'},
-    #     {'name': 'TomT', 'team_id': '128932'},
-    #     {'name': 'JB', 'team_id': '234477'} 
-    # ]
+player_list = [
+    {'name': 'Muks(muks)', 'team_id': '4451140'},
+    {'name': 'Harry', 'team_id': '278724'},
+    {'name': 'TomT', 'team_id': '128932'},
+    {'name': 'JB', 'team_id': '234477'} 
+]
 def get_player_data(players): 
     for player in players:
         team_id = player['team_id']
@@ -67,11 +67,12 @@ def display_all_week_scores():
     data = get_player_data(player_list)
     scores = get_player_scores(data)
     week_scores = group_scores_by_week(scores)
+    number_of_weeks = len(week_scores)
     colnames = [*(week_scores[0].keys())]
     scorenames = colnames[1:]
     totals = calculate_total_scores(week_scores)
     points = calculate_points(week_scores)
-    winnings = dict(calculate_winnings(week_scores))
+    winnings = dict(calculate_winnings(points, number_of_weeks))
 
     return render_template('full_scores.html', records=week_scores, colnames=colnames, 
         scorenames=scorenames, totals=totals, points=points, winnings=winnings)
@@ -84,9 +85,8 @@ def calculate_total_scores(scores):
 
     return total_scores
 
-def calculate_winnings(scores):
-    points = calculate_points()
-    number_of_weeks = len(scores)
+def calculate_winnings(points, number_of_weeks):
+    number_of_weeks = number_of_weeks
     winnings = {}
     for player, score in points.items():
         score = score - number_of_weeks

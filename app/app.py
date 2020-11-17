@@ -10,18 +10,18 @@ import sys
 app = Flask(__name__)
 
 fpl_api_base_url = 'https://fantasy.premierleague.com/api/entry/'
-# player_list = [
-#     {'name': 'JH', 'team_id': '258789'},
-#     {'name': 'Harry', 'team_id': '278724'},
-#     {'name': 'Alex', 'team_id': '422587'}
-# ]
-
 player_list = [
-    {'name': 'Muks(muks)', 'team_id': '4451140'},
+    {'name': 'JH', 'team_id': '258789'},
     {'name': 'Harry', 'team_id': '278724'},
-    {'name': 'TomT', 'team_id': '128932'},
-    {'name': 'JB', 'team_id': '234477'} 
+    {'name': 'Alex', 'team_id': '422587'}
 ]
+
+# player_list = [
+#     {'name': 'Muks(muks)', 'team_id': '4451140'},
+#     {'name': 'Harry', 'team_id': '278724'},
+#     {'name': 'TomT', 'team_id': '128932'},
+#     {'name': 'JB', 'team_id': '234477'} 
+# ]
 def get_player_data(players): 
     for player in players:
         team_id = player['team_id']
@@ -64,18 +64,18 @@ def home():
 
 @app.route("/scores", methods=['GET', 'POST', 'PUT'])
 def display_all_week_scores():
-    data = get_player_data(player_list)
-    scores = get_player_scores(data)
-    week_scores = group_scores_by_week(scores)
-    number_of_weeks = len(week_scores)
-    colnames = [*(week_scores[0].keys())]
+    player_data = get_player_data(player_list)
+    player_scores = get_player_scores(player_data)
+    weekly_scores = group_scores_by_week(player_scores)
+    total_scores = calculate_total_scores(weekly_scores)
+    total_points = calculate_points(weekly_scores)
+    number_of_weeks_passed = len(weekly_scores) 
+    colnames = [*(weekly_scores[0].keys())]
     scorenames = colnames[1:]
-    totals = calculate_total_scores(week_scores)
-    points = calculate_points(week_scores)
-    winnings = dict(calculate_winnings(points, number_of_weeks))
+    winnings = calculate_winnings(total_points, number_of_weeks_passed)
 
-    return render_template('full_scores.html', records=week_scores, colnames=colnames, 
-        scorenames=scorenames, totals=totals, points=points, winnings=winnings)
+    return render_template('full_scores.html', records=weekly_scores, colnames=colnames, 
+        scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings)
 
 def calculate_total_scores(scores):
     scores = scores
@@ -98,10 +98,12 @@ def calculate_winnings(points, number_of_weeks):
             cash_score = f"{int(score*100)}p"
         winnings[player] = cash_score
 
-    return winnings
+    return dict(winnings)
 
-def calculate_points(scores):
+def calculate_points(scores, winning_points = 2, second_points = 1):
     scores = scores
+    draw_win_points = (winning_points + second_points)/2
+    draw_second_points = second_points/2
     
     weekly_scores = [
         sorted([(v, k) for k, v in week.items() if k[-6:] == " Score"], reverse=True)
@@ -111,16 +113,16 @@ def calculate_points(scores):
 
     for week in weekly_scores:
         total_scores[week[0][1]] += ( #total_scores[name] += score
-            2 if week[0][0] > week[1][0]
-            else 1.5
+            winning_points if week[0][0] > week[1][0]
+            else draw_win_points
         )
         total_scores[week[1][1]] += (
-            1.5 if week[0][0] == week[1][0]
-            else 1 if week[1][0] > week[2][0]
-            else 0.5
+            draw_win_points if week[0][0] == week[1][0]
+            else second_points if week[1][0] > week[2][0]
+            else draw_second_points
         )
         total_scores[week[2][1]] += (
-            0.5 if week[1][0] == week[2][0]
+            draw_second_points if week[1][0] == week[2][0]
             else 0
         )
 

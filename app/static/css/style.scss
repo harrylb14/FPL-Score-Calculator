@@ -5,6 +5,12 @@ h1.Greeting {
   transform: translate(-50%, -50%);
 }
 
+.form-group{
+  position: absolute;
+  top: 58%;
+  left: 50%;
+  transform: translate(-50%, -10%);
+}
 #button {
     background: linear-gradient(45deg, #49a09d, #5f2c82);
     box-shadow: 0 5px 0 rgb(27, 2, 68);
@@ -12,18 +18,18 @@ h1.Greeting {
     padding: 1em 1.5em;
     position: absolute;
     text-decoration: none;
-    top: 60%;
+    top: 70%;
     left: 50%;
     transform: translate(-50%, -20%);
     border-radius: 15px;
 }
   
-.button:hover {
+#button:hover {
     background: linear-gradient(45deg, #295c5a, #3b1b50);
     cursor: pointer;
 }
   
-.button:active {
+#button:active {
     box-shadow: none;
  }
 

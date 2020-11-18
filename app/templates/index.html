@@ -2,14 +2,23 @@
 
 {% block content %}
 
-        <div class="group-form">
+        <div class="info-box">
             <h2>Enter Group Name</h2>
             <form action='/scores' method="POST">
-              <div class="user-box">
-                <input type="text" name="groupname" required="">
-                <label>Group Name</label>
-              </div>
-              <div id="button">
+                <div class="user-box">
+                    <input type="text" name="groupname" required="">
+                    <label>Group Name</label>
+                </div>
+                <div id='flashes'>
+                    {% with messages = get_flashed_messages(category_filter=["invalid group"]) %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div>{{ message }}</div>
+                            {%endfor%}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+              <div class="button">
                 <span></span>
                 <span></span>
                 <span></span>

@@ -8,7 +8,7 @@ body {
   background: linear-gradient(#141e30, #243b55);
 }
 
-.group-form {
+.info-box {
   position: absolute;
   justify-content: center;
   align-items: center;
@@ -23,18 +23,18 @@ body {
   border-radius: 10px;
 }
 
-.group-form h2 {
+.info-box h2 {
   margin: 0 0 30px;
   padding: 0;
   color: #fff;
   text-align: center;
 }
 
-.group-form .user-box {
+.info-box .user-box {
   position: relative;
 }
 
-.group-form .user-box input {
+.info-box .user-box input {
   width: 100%;
   padding: 10px 0;
   font-size: 16px;
@@ -45,7 +45,7 @@ body {
   outline: none;
   background: transparent;
 }
-.group-form .user-box label {
+.info-box .user-box label {
   position: absolute;
   top:0;
   left: 0;
@@ -56,15 +56,15 @@ body {
   transition: .5s;
 }
 
-.group-form .user-box input:focus ~ label,
-.group-form .user-box input:valid ~ label {
+.info-box .user-box input:focus ~ label,
+.info-box .user-box input:valid ~ label {
   top: -20px;
   left: 0;
   color: #03e9f4;
   font-size: 12px;
 }
 
-.group-form form #button {
+.info-box form .button {
   position: relative;
   display: inline-block;
   padding: 10px 20px;
@@ -80,7 +80,7 @@ body {
   transform: translate(65%, 0);
 }
 
-.group-form #button:hover {
+.info-box .button:hover {
   background: #03e9f4;
   color: #fff;
   border-radius: 5px;
@@ -90,12 +90,12 @@ body {
               0 0 100px #03e9f4;
 }
 
-.group-form #button span {
+.info-box .button span {
   position: absolute;
   display: block;
 }
 
-.group-form #button span:nth-child(1) {
+.info-box .button span:nth-child(1) {
   top: 0;
   left: -100%;
   width: 100%;
@@ -113,7 +113,7 @@ body {
   }
 }
 
-.group-form #button span:nth-child(2) {
+.info-box .button span:nth-child(2) {
   top: -100%;
   right: 0;
   width: 2px;
@@ -131,7 +131,7 @@ body {
   }
 }
 
-.group-form #button span:nth-child(3) {
+.info-box .button span:nth-child(3) {
   bottom: 0;
   right: -100%;
   width: 100%;
@@ -150,7 +150,7 @@ body {
   }
 }
 
-.group-form #button span:nth-child(4) {
+.info-box button span:nth-child(4) {
   bottom: -100%;
   left: 0;
   width: 2px;
@@ -176,6 +176,14 @@ body {
   border: none !important;
 }
 
+#flashes {
+  margin: 0 0 30px;
+  padding: 0;
+  font-size: 10px;
+  font-style: italic;
+  color: #fff;
+  text-align: left;
+}
 
 h1.Greeting {
   position: absolute;

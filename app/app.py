@@ -75,7 +75,7 @@ def display_all_week_scores():
     elif group_name in ('CTL', 'ctl'):
         player_list = player_list_ctl
     else:
-        flash('Incorrect Group Name!')
+        flash('No group with this name!', 'invalid group')
         return redirect(url_for('home'))
 
     player_data = get_player_data(player_list)
@@ -141,6 +141,11 @@ def calculate_winnings(points, number_of_weeks):
         winnings[player] = cash_score
 
     return dict(winnings)
+
+@app.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return render_template('404.html'), 404
 
 if __name__ == "__main__":
     app.run(debug = True)

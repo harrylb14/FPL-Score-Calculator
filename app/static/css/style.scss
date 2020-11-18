@@ -64,23 +64,26 @@ body {
   font-size: 12px;
 }
 
-.info-box form .button {
+.button {
   position: relative;
   display: inline-block;
   padding: 10px 20px;
   color: #03e9f4;
   font-size: 16px;
   text-decoration: none;
-  text-transform: uppercase;
+  // text-transform: uppercase;
   overflow: hidden;
   transition: .5s;
   margin-top: 40px;
   letter-spacing: 4px;
   background-color: transparent;
+  
+}
+.info-box .button {
   transform: translate(65%, 0);
 }
 
-.info-box .button:hover {
+.button:hover {
   background: #03e9f4;
   color: #fff;
   border-radius: 5px;
@@ -90,12 +93,12 @@ body {
               0 0 100px #03e9f4;
 }
 
-.info-box .button span {
+.button span {
   position: absolute;
   display: block;
 }
 
-.info-box .button span:nth-child(1) {
+.button span:nth-child(1) {
   top: 0;
   left: -100%;
   width: 100%;
@@ -113,7 +116,7 @@ body {
   }
 }
 
-.info-box .button span:nth-child(2) {
+.button span:nth-child(2) {
   top: -100%;
   right: 0;
   width: 2px;
@@ -131,7 +134,7 @@ body {
   }
 }
 
-.info-box .button span:nth-child(3) {
+.button span:nth-child(3) {
   bottom: 0;
   right: -100%;
   width: 100%;
@@ -150,7 +153,7 @@ body {
   }
 }
 
-.info-box button span:nth-child(4) {
+.button span:nth-child(4) {
   bottom: -100%;
   left: 0;
   width: 2px;
@@ -239,6 +242,7 @@ body {
   -webkit-transform: translate(-50%, -50%);
           transform: translate(-50%, -50%);
 }
+
 table {
   width: 800px;
   border-collapse: collapse;
@@ -277,11 +281,16 @@ tbody td:hover:before {
 }
 
 .text {
-	width:40%;
-    height:200px;
 	top: 600px;
 	left: 40%;
 	position: relative;
 	font-family: sans-serif;
-	font-weight: 100;
+  font-weight: 100;
+  display: inline-block;
   }
+#full-scores-go-back{
+	top: 450px;
+	left: 6%;
+  position: relative;
+  display: inline-block;
+}

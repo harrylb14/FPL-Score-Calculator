@@ -1,13 +1,15 @@
-from flask import Flask, render_template, request
+from flask import Flask, flash, redirect, render_template, \
+     request, url_for
 import requests
 from collections import defaultdict
 import collections 
 import functools 
 import operator 
-import sys
+import os
 
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
 fpl_api_base_url = 'https://fantasy.premierleague.com/api/entry/'
 player_list_boys = [
@@ -72,6 +74,9 @@ def display_all_week_scores():
         player_list = player_list_boys
     elif group_name in ('CTL', 'ctl'):
         player_list = player_list_ctl
+    else:
+        flash('Incorrect Group Name!')
+        return redirect(url_for('home'))
 
     player_data = get_player_data(player_list)
     player_scores = get_player_scores(player_data)

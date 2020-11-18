@@ -7,7 +7,19 @@ def test_index():
     assert response.status_code == 200
     assert 'Hi there, Friends!' in str(response.data)
 
-def test_view_scores():
+def test_view_scores_boys():
     tester = app.test_client()
-    response = tester.get('/scores', content_type="html/text")
+    response = tester.post('/scores', data = {'groupname': 'boys'})
     assert response.status_code == 200
+    assert 'JH Score' in str(response.data)
+
+def test_view_scores_ctl():
+    tester = app.test_client()
+    response = tester.post('/scores', data = {'groupname': 'ctl'})
+    assert response.status_code == 200
+    assert 'TomT Score' in str(response.data)
+
+# def test_incorrect_group_name():
+#     tester = app.test_client()
+#     response = tester.post('/scores', data = {'groupname': 'ctl'})
+#     assert 

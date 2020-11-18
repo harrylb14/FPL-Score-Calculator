@@ -30,12 +30,14 @@
                     <td>{{ points[name] }} </td>
                 {% endfor %}
             </tr>
+            {% if groupname == 'boys' %}
             <tr>
                 <td> <b> Net Winnings: </b></td>
                 {% for name in scorenames %}  
                     <td>{{ winnings[name] }} </td>
                 {% endfor %}
             </tr>
+            {% endif %}
         </tbody>
     </table>
 </div>

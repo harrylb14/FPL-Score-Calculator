@@ -3,8 +3,15 @@
 {% block content %}
     
         <h1 class="Greeting"> Hi there, Friends! </h1>
-        
-        <a href='/scores' class='button'>View Scores</a>
+
+        <form action="/scores" method="POST">
+
+            <div class="form-group">
+              <label>Enter Group Name</label>
+              <input type="text" class="form-control" id="groupname" name="groupname" placeholder="Go Team!">
+              <button type="submit"  class='button' id='button'>View Scores</button>
+            </div>
+        </form>
         
     
 {% endblock %}

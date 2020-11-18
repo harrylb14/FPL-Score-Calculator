@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import requests
 from collections import defaultdict
 import collections 
@@ -10,18 +10,18 @@ import sys
 app = Flask(__name__)
 
 fpl_api_base_url = 'https://fantasy.premierleague.com/api/entry/'
-player_list = [
+player_list_boys = [
     {'name': 'JH', 'team_id': '258789'},
     {'name': 'Harry', 'team_id': '278724'},
     {'name': 'Alex', 'team_id': '422587'}
 ]
 
-# player_list = [
-#     {'name': 'Muks(muks)', 'team_id': '4451140'},
-#     {'name': 'Harry', 'team_id': '278724'},
-#     {'name': 'TomT', 'team_id': '128932'},
-#     {'name': 'JB', 'team_id': '234477'} 
-# ]
+player_list_ctl = [
+    {'name': 'Muks(muks)', 'team_id': '4451140'},
+    {'name': 'Harry', 'team_id': '278724'},
+    {'name': 'TomT', 'team_id': '128932'},
+    {'name': 'JB', 'team_id': '234477'} 
+]
 def get_player_data(players): 
     for player in players:
         team_id = player['team_id']
@@ -62,8 +62,17 @@ def group_scores_by_week(scores):
 def home():
     return render_template('index.html')
 
+
 @app.route("/scores", methods=['GET', 'POST', 'PUT'])
 def display_all_week_scores():
+    req = request.form
+    group_name = req.get("groupname")
+
+    if group_name in ('boys', 'Boys'):
+        player_list = player_list_boys
+    elif group_name in ('CTL', 'ctl'):
+        player_list = player_list_ctl
+
     player_data = get_player_data(player_list)
     player_scores = get_player_scores(player_data)
     weekly_scores = group_scores_by_week(player_scores)
@@ -75,7 +84,7 @@ def display_all_week_scores():
     winnings = calculate_winnings(total_points, number_of_weeks_passed)
 
     return render_template('full_scores.html', records=weekly_scores, colnames=colnames, 
-        scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings)
+        scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings, groupname = group_name)
 
 def calculate_total_scores(scores):
     scores = scores

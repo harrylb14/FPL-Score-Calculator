@@ -1,17 +1,23 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    
-        <h1 class="Greeting"> Hi there, Friends! </h1>
 
-        <form action="/scores" method="POST">
-
-            <div class="form-group">
-              <label>Enter Group Name</label>
-              <input type="text" class="form-text" id="groupname" name="groupname" placeholder="Go Team!">
-            </div>
-              <button type="submit"  class='button' id='button'>View Scores</button>           
-        </form>
+        <div class="group-form">
+            <h2>Enter Group Name</h2>
+            <form action='/scores' method="POST">
+              <div class="user-box">
+                <input type="text" name="" required="">
+                <label>Group Name</label>
+              </div>
+              <div id="button">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <button id='submit'>View Scores</button>
+              </div>
+            </form>
+          </div>
         
     
 {% endblock %}

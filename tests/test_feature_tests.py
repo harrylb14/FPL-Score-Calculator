@@ -1,4 +1,5 @@
 from app.app import app
+from flask import Flask
 import requests
 
 def test_index():
@@ -19,7 +20,8 @@ def test_view_scores_ctl():
     assert response.status_code == 200
     assert 'TomT Score' in str(response.data)
 
-# def test_incorrect_group_name():
-#     tester = app.test_client()
-#     response = tester.post('/scores', data = {'groupname': 'ctl'})
-#     assert 
+def test_404():
+    tester = app.test_client()
+    response = tester.get('/invalid')
+    assert response.status_code == 404
+    assert 'Oops' in str(response.data)

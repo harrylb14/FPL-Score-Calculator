@@ -26,7 +26,6 @@ def test_incorrect_group_name_flash_message():
     with tester.session_transaction() as session:
         flash_message = dict(session['_flashes']).get('invalid group')
  
-
     assert response.status_code == 302
     assert flash_message is not None 
     assert flash_message == 'No group with this name!'

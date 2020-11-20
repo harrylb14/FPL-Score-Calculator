@@ -20,6 +20,18 @@ def test_view_scores_ctl():
     assert response.status_code == 200
     assert 'TomT Score' in str(response.data)
 
+def test_incorrect_group_name_flash_message():
+    tester = app.test_client()
+    response = tester.post('/scores', data = {'groupname': 'fakeName'})
+    with tester.session_transaction() as session:
+        flash_message = dict(session['_flashes']).get('invalid group')
+ 
+
+    assert response.status_code == 302
+    assert flash_message is not None 
+    assert flash_message == 'No group with this name!'
+
+
 def test_404():
     tester = app.test_client()
     response = tester.get('/invalid')

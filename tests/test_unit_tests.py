@@ -1,5 +1,6 @@
 import requests
-from app.app import get_player_data, get_player_scores, group_scores_by_week, calculate_total_scores, calculate_points, fpl_api_base_url
+from app.app import get_player_data, get_player_scores, group_scores_by_week, \
+    calculate_total_scores, calculate_points, fpl_api_base_url
 
 def test_get_player_data(requests_mock):
     test_player = [{'name': 'Test', 'team_id': '111111'}]

@@ -6,7 +6,7 @@ import collections
 import functools 
 import operator 
 import os
-from app.groups import player_list_boys, player_list_ctl
+from .groups import player_list_boys, player_list_ctl
 
 
 app = Flask(__name__)

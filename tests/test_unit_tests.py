@@ -1,11 +1,9 @@
 import requests
-from app.app import *
-
-base_fpl_url = 'https://fantasy.premierleague.com/api/entry'
+from app.app import get_player_data, get_player_scores, group_scores_by_week, calculate_total_scores, calculate_points, fpl_api_base_url
 
 def test_get_player_data(requests_mock):
     test_player = [{'name': 'Test', 'team_id': '111111'}]
-    requests_mock.get(f'{base_fpl_url}/111111/history/', json= {'current':{'data': 'mock_data'}})
+    requests_mock.get(f'{fpl_api_base_url}111111/history/', json= {'current':{'data': 'mock_data'}})
     resp = get_player_data(test_player)
 
     assert resp == [{'name': 'Test', 'team_id': '111111', 'data': {'data': 'mock_data'}}]

@@ -6,24 +6,13 @@ import collections
 import functools 
 import operator 
 import os
+from app.groups import player_list_boys, player_list_ctl
 
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
-
 fpl_api_base_url = 'https://fantasy.premierleague.com/api/entry/'
-player_list_boys = [
-    {'name': 'JH', 'team_id': '258789'},
-    {'name': 'Harry', 'team_id': '278724'},
-    {'name': 'Alex', 'team_id': '422587'}
-]
 
-player_list_ctl = [
-    {'name': 'Muks(muks)', 'team_id': '4451140'},
-    {'name': 'Harry', 'team_id': '278724'},
-    {'name': 'TomT', 'team_id': '128932'},
-    {'name': 'JB', 'team_id': '234477'} 
-]
 def get_player_data(players): 
     for player in players:
         team_id = player['team_id']

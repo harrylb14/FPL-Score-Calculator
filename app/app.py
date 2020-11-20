@@ -53,6 +53,9 @@ def group_scores_by_week(scores):
 def home():
     return render_template('index.html')
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 @app.route("/scores", methods=['GET', 'POST', 'PUT'])
 def display_all_week_scores():
@@ -130,11 +133,6 @@ def calculate_winnings(points, number_of_weeks):
         winnings[player] = cash_score
 
     return dict(winnings)
-
-@app.errorhandler(404)
-def page_not_found(e):
-    # note that we set the 404 status explicitly
-    return render_template('404.html'), 404
 
 if __name__ == "__main__":
     app.run(debug = True)

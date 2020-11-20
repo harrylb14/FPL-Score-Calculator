@@ -30,7 +30,6 @@ def test_incorrect_group_name_flash_message():
     assert flash_message is not None 
     assert flash_message == 'No group with this name!'
 
-
 def test_404():
     tester = app.test_client()
     response = tester.get('/invalid')

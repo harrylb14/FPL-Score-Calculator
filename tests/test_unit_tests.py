@@ -10,8 +10,8 @@ def test_get_player_data(requests_mock):
     assert resp == [{'name': 'Test', 'team_id': '111111', 'data': {'data': 'mock_data'}}]
 
 # def test_scores_updating_page(requests_mock):
-#     test_player = [{'name': 'Test', 'team_id': '111112'}]
-#     requests_mock.get(f'{fpl_api_base_url}11111/history/', json={'The game is being updated.'}) 
+#     test_player = [{'name': 'Test', 'team_id': '11111'}]
+#     requests_mock.get(f'{fpl_api_base_url}/11111/history/', json={"The game is being updated."})
 #     resp = get_player_data(test_player)
 #     print(resp)
 
@@ -21,7 +21,7 @@ def test_get_player_scores():
     test_player_data = [
         {'name': 'Test', 'team_id': '111111', 'data': [{'event': 1, 'points': 71, 'event_transfers_cost': 0},{'event': 2, 'points': 50, 'event_transfers_cost': 0}]},
         {'name': 'Test 2', 'team_id': '111112', 'data': [{'event': 1, 'points': 30, 'event_transfers_cost': 4},{'event': 2, 'points': 80, 'event_transfers_cost': 0}]}
-        ]
+    ]
     result = get_player_scores(test_player_data)
 
     assert result == [[{'GameWeek': 1, 'Test Score': 71}, {'GameWeek': 2, 'Test Score': 50}], [{'GameWeek': 1, 'Test 2 Score': 26}, {'GameWeek': 2, 'Test 2 Score': 80}]]

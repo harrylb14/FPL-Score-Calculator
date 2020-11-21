@@ -20,6 +20,7 @@ def get_player_data(players):
         url = f'{fpl_api_base_url}/{team_id}/history/'
         r = requests.get(url)
         json = r.json()
+        print(json)
         if json == 'The game is being updated.':
             return 'Updating'
             

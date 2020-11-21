@@ -11,12 +11,13 @@ from .groups import player_list_boys, player_list_ctl
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
-fpl_api_base_url = 'https://fantasy.premierleague.com/api/entry/'
+fpl_api_base_url = 'https://fantasy.premierleague.com/api/entry'
+live_scores_base_url = 'https://fantasy.premierleague.com/api/event'
 
 def get_player_data(players): 
     for player in players:
         team_id = player['team_id']
-        url = f'{fpl_api_base_url}{team_id}/history/'
+        url = f'{fpl_api_base_url}/{team_id}/history/'
         r = requests.get(url)
         json = r.json()
         if json == 'The game is being updated.':
@@ -28,8 +29,7 @@ def get_player_data(players):
     return players
 
 def get_managers_live_gameweek_score(managers, gameweek):
-    live_scores_url = f'https://fantasy.premierleague.com/api/event/{gameweek}/live/'
-    player_scores = requests.get(f'{live_scores_url}').json()
+    player_scores = requests.get(f'{live_scores_base_url}/{gameweek}/live/').json()
 
     live_scores = {}
 
@@ -37,7 +37,7 @@ def get_managers_live_gameweek_score(managers, gameweek):
         score = 0
         team_id = manager['team_id']
         name = manager['name']
-        current_week_players = requests.get(f'{fpl_api_base_url}{team_id}/event/{gameweek}/picks/').json()
+        current_week_players = requests.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
         player_list = current_week_players['picks']
   
         for player in player_list:

@@ -4,7 +4,7 @@ from app.app import get_player_data, get_player_scores, group_scores_by_week, \
 
 def test_get_player_data(requests_mock):
     test_player = [{'name': 'Test', 'team_id': '111111'}]
-    requests_mock.get(f'{fpl_api_base_url}111111/history/', json= {'current':{'data': 'mock_data'}})
+    requests_mock.get(f'{fpl_api_base_url}/111111/history/', json= {'current':{'data': 'mock_data'}})
     resp = get_player_data(test_player)
 
     assert resp == [{'name': 'Test', 'team_id': '111111', 'data': {'data': 'mock_data'}}]
@@ -74,7 +74,7 @@ def test_get_live_scores(requests_mock):
     requests_mock.get(f'https://fantasy.premierleague.com/api/event/1/live/', \
         json= {'elements':[{"stats": {"total_points":10}}, {"stats": {"total_points":15}}, {"stats": {"total_points":5}}]})
 
-    requests_mock.get(f'{fpl_api_base_url}{111111}/event/1/picks/', \
+    requests_mock.get(f'{fpl_api_base_url}/111111/event/1/picks/', \
         json= {'picks':[{'element': 1, 'multiplier': 1}, {'element': 2, 'multiplier': 2}, {'element': 3, 'multiplier': 1}]})
 
     test_managers = [{'name': 'Test', 'team_id': '111111'}]

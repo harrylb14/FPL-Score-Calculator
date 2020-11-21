@@ -27,8 +27,7 @@ def get_player_data(players):
     
     return players
 
-def get_player_live_gameweek_score(managers):
-    gameweek = len(managers[0]['data'])
+def get_managers_live_gameweek_score(managers, gameweek):
     live_scores_url = f'https://fantasy.premierleague.com/api/event/{gameweek}/live/'
     player_scores = requests.get(f'{live_scores_url}').json()
 
@@ -45,10 +44,9 @@ def get_player_live_gameweek_score(managers):
             player_id = player['element']
             player_data = player_scores['elements'][player_id - 1]
             player_live_score = player_data['stats']['total_points']
-            if player['is_captain'] == True: 
-                score += 2*player_live_score
-            else:
-                score += player_live_score
+             
+            score += int(player['multiplier'])*player_live_score
+            
         live_scores[f'{name} Score'] = score
 
     return live_scores
@@ -102,10 +100,11 @@ def display_all_week_scores():
     player_data = get_player_data(player_list)
     if player_data == 'Updating':
         return render_template('updating.html')
-    else:
+    else: 
         player_scores = get_player_scores(player_data)
-        live_scores = get_player_live_gameweek_score(player_list)
         weekly_scores = group_scores_by_week(player_scores)
+        gameweek = len(weekly_scores)
+        live_scores = get_managers_live_gameweek_score(player_list, gameweek)
         current_week = weekly_scores[-1]
         xx, yy = Counter(current_week), Counter(live_scores)
         xx.update(yy)
@@ -113,10 +112,9 @@ def display_all_week_scores():
         weekly_scores[-1] = updated_current_week
         total_scores = calculate_total_scores(weekly_scores)
         total_points = calculate_points(weekly_scores)
-        number_of_weeks_passed = len(weekly_scores) 
         colnames = [*(weekly_scores[0].keys())]
         scorenames = colnames[1:]
-        winnings = calculate_winnings(total_points, number_of_weeks_passed)
+        winnings = calculate_winnings(total_points, gameweek)
 
     return render_template('full_scores.html', records=weekly_scores, colnames=colnames, 
         scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings, groupname = group_name, live_scores = live_scores)

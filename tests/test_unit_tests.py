@@ -1,6 +1,6 @@
 import requests
 from app.app import get_player_data, get_player_scores, group_scores_by_week, \
-    calculate_total_scores, calculate_points, fpl_api_base_url
+    calculate_total_scores, calculate_points, fpl_api_base_url, get_managers_live_gameweek_score
 
 def test_get_player_data(requests_mock):
     test_player = [{'name': 'Test', 'team_id': '111111'}]
@@ -69,3 +69,15 @@ def test_calculate_points_with_all_scores_draw():
     result = calculate_points(test_score_data)
 
     assert result ==  {'Test Score': 1, 'Test 2 Score': 1, 'Test 3 Score': 1}
+
+def test_get_live_scores(requests_mock): 
+    requests_mock.get(f'https://fantasy.premierleague.com/api/event/1/live/', \
+        json= {'elements':[{"stats": {"total_points":10}}, {"stats": {"total_points":15}}, {"stats": {"total_points":5}}]})
+
+    requests_mock.get(f'{fpl_api_base_url}{111111}/event/1/picks/', \
+        json= {'picks':[{'element': 1, 'multiplier': 1}, {'element': 2, 'multiplier': 2}, {'element': 3, 'multiplier': 1}]})
+
+    test_managers = [{'name': 'Test', 'team_id': '111111'}]
+    live_scores = get_managers_live_gameweek_score(test_managers, 1)
+
+    assert live_scores == { 'Test Score': 45 }

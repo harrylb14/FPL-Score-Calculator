@@ -9,6 +9,14 @@ def test_get_player_data(requests_mock):
 
     assert resp == [{'name': 'Test', 'team_id': '111111', 'data': {'data': 'mock_data'}}]
 
+# def test_scores_updating_page(requests_mock):
+#     test_player = [{'name': 'Test', 'team_id': '111112'}]
+#     requests_mock.get(f'{fpl_api_base_url}11111/history/', json={'The game is being updated.'}) 
+#     resp = get_player_data(test_player)
+#     print(resp)
+
+#     assert resp == 'Updating'
+
 def test_get_player_scores():
     test_player_data = [
         {'name': 'Test', 'team_id': '111111', 'data': [{'event': 1, 'points': 71, 'event_transfers_cost': 0},{'event': 2, 'points': 50, 'event_transfers_cost': 0}]},
@@ -53,3 +61,11 @@ def test_calculate_points_with_draw():
     result = calculate_points(test_score_data)
 
     assert result ==  {'Test Score': 2, 'Test 2 Score': 3.5, 'Test 3 Score': 0.5}
+
+def test_calculate_points_with_all_scores_draw():
+    test_score_data = [
+        {'GameWeek': 1, 'Test Score': 71, 'Test 2 Score': 71, 'Test 3 Score': 71}, 
+    ]
+    result = calculate_points(test_score_data)
+
+    assert result ==  {'Test Score': 1, 'Test 2 Score': 1, 'Test 3 Score': 1}

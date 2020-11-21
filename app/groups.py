@@ -8,5 +8,6 @@ player_list_ctl = [
     {'name': 'Muks(muks)', 'team_id': '4451140'},
     {'name': 'Harry', 'team_id': '278724'},
     {'name': 'TomT', 'team_id': '128932'},
-    {'name': 'JB', 'team_id': '234477'} 
+    {'name': 'JB', 'team_id': '234477'},
+    {'name': 'Zoe', 'team_id': '5164469'}  
 ]

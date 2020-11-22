@@ -152,8 +152,11 @@ def calculate_points(scores, winner_points = 2, second_points = 1):
                 total_points[name] += winning_points
             elif points == second_place_score:
                 total_points[name] += second_place_points
-       
-    return dict(total_points)
+
+    # formatting to remove .0 from whole numbers
+    total_points = {k: (int(v) if (v%1 == 0) else v) for k, v in dict(total_points).items() }
+
+    return total_points
 
 def calculate_winnings(points, number_of_weeks):
     number_of_weeks = number_of_weeks

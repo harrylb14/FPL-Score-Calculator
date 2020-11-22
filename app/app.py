@@ -7,7 +7,7 @@ import collections
 import functools 
 import operator 
 import os
-from .groups import player_list_boys, player_list_ctl
+from .groups import groups
 
 
 app = Flask(__name__)
@@ -91,7 +91,7 @@ def direct_to_scores():
     req = request.form
     groupname = req.get("groupname").lower()
 
-    if groupname not in ['boys', 'ctl']:    #need to make general
+    if not any(group['groupname'] == groupname for group in groups):    #search groups for groupname
         flash('No group with this name!', 'invalid group')
         return redirect(url_for('home'))
 
@@ -99,13 +99,9 @@ def direct_to_scores():
 
 @app.route("/scores/<groupname>", methods=['GET', 'POST', 'PUT'])
 def display_all_week_scores(groupname):
-
-    if groupname == 'boys':
-        group = player_list_boys 
-    elif groupname == 'ctl':
-        group = player_list_ctl
-
-    player_data = get_player_data(group)
+    group = next(group for group in groups if group["groupname"] == groupname)
+    player_list = group['players']
+    player_data = get_player_data(player_list)
 
     if player_data == 'Updating':
         return render_template('updating.html')
@@ -113,7 +109,7 @@ def display_all_week_scores(groupname):
         player_scores = get_player_scores(player_data)
         weekly_scores = group_scores_by_week(player_scores)
         gameweek = len(weekly_scores)
-        live_scores = get_managers_live_gameweek_score(group, gameweek)
+        live_scores = get_managers_live_gameweek_score(player_list, gameweek)
         weekly_scores[-1] = live_scores
         # xx, yy = Counter(current_week), Counter(live_scores)
         # xx.update(yy)

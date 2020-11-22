@@ -110,7 +110,7 @@ def display_all_week_scores(groupname):
         weekly_scores = group_scores_by_week(player_scores)
         gameweek = len(weekly_scores)
         live_scores = get_managers_live_gameweek_score(player_list, gameweek)
-        weekly_scores[-1] = live_scores
+        # weekly_scores[-1] = live_scores
         # xx, yy = Counter(current_week), Counter(live_scores)
         # xx.update(yy)
         # updated_current_week = xx

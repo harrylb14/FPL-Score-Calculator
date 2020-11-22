@@ -90,9 +90,9 @@ def display_all_week_scores():
     req = request.form
     group_name = req.get("groupname")
 
-    if group_name in ('boys', 'Boys'):
+    if group_name.lower() == 'boys':
         player_list = player_list_boys
-    elif group_name in ('CTL', 'ctl'):
+    elif group_name.lower() == 'ctl':
         player_list = player_list_ctl
     else:
         flash('No group with this name!', 'invalid group')
@@ -106,13 +106,11 @@ def display_all_week_scores():
         weekly_scores = group_scores_by_week(player_scores)
         gameweek = len(weekly_scores)
         live_scores = get_managers_live_gameweek_score(player_list, gameweek)
-        live_scores['GameWeek'] = gameweek
-        # current_week = weekly_scores[-1]
+        weekly_scores[-1] = live_scores
         # xx, yy = Counter(current_week), Counter(live_scores)
         # xx.update(yy)
         # updated_current_week = xx
         # weekly_scores[-1] = updated_current_week
-        weekly_scores[-1] = live_scores
         total_scores = calculate_total_scores(weekly_scores)
         total_points = calculate_points(weekly_scores)
         colnames = [*(weekly_scores[0].keys())]
@@ -130,36 +128,32 @@ def calculate_total_scores(scores):
 
     return total_scores
 
-def calculate_points(scores, winning_points = 2, second_points = 1):
+def calculate_points(scores, winner_points = 2, second_points = 1):
     scores = scores
-    draw_win_points = (winning_points + second_points)/2
-    draw_second_points = second_points/2
     
     weekly_scores = [
         sorted([(v, k) for k, v in week.items() if k[-6:] == " Score"], reverse=True)
         for week in scores
     ]
-    total_scores = defaultdict(int)
+    total_points = defaultdict(int)
 
     for week in weekly_scores:
-        total_scores[week[0][1]] += ( #total_scores[name] += score
-            winning_points if week[0][0] > week[1][0]
-            else second_points if week[0][0] == week[1][0] == week[2][0]
-            else draw_win_points
-        )
-        total_scores[week[1][1]] += (
-            second_points if week[0][0] == week[1][0] == week[2][0]
-            else draw_win_points if week[0][0] == week[1][0]
-            else second_points if week[1][0] > week[2][0]
-            else draw_second_points
-        )
-        total_scores[week[2][1]] += (
-            second_points if week[0][0] == week[1][0] == week[2][0]
-            else draw_second_points if week[1][0] == week[2][0]
-            else 0
-        )
+        score_distribution = Counter(score[0] for score in week)
+        highest_score, second_place_score = week[0][0], week[1][0]
+        number_of_first_place = score_distribution[highest_score]
+        number_of_second_place = score_distribution[second_place_score]
+        winning_points = second_points + ((winner_points-second_points)/number_of_first_place)
+        second_place_points = second_points/number_of_second_place
 
-    return dict(total_scores)
+        for score in week:
+            points = score[0]
+            name = score[1]
+            if points == highest_score: 
+                total_points[name] += winning_points
+            elif points == second_place_score:
+                total_points[name] += second_place_points
+       
+    return dict(total_points)
 
 def calculate_winnings(points, number_of_weeks):
     number_of_weeks = number_of_weeks

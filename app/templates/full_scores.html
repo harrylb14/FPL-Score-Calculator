@@ -12,7 +12,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for record in records %}
+            {% for record in records[:-1] %}
             <tr>
                 {% for col in colnames %}
                 <td>{{ record[col] }}</td>

@@ -1,6 +1,7 @@
 from flask import Flask, flash, redirect, render_template, \
      request, url_for
 import requests
+import numpy as np
 from collections import defaultdict, Counter
 import collections 
 import functools 
@@ -138,12 +139,19 @@ def calculate_points(scores, winner_points = 2, second_points = 1):
     total_points = defaultdict(int)
 
     for week in weekly_scores:
+
         score_distribution = Counter(score[0] for score in week)
-        highest_score, second_place_score = week[0][0], week[1][0]
+        highest_score = week[0][0]
         number_of_first_place = score_distribution[highest_score]
-        number_of_second_place = score_distribution[second_place_score]
-        winning_points = second_points + ((winner_points-second_points)/number_of_first_place)
-        second_place_points = second_points/number_of_second_place
+        second_place_score = list(score_distribution)[1] if len(list(score_distribution)) > 1 else 0
+        number_of_second_place = score_distribution[second_place_score] if len(list(score_distribution)) > 1 else 0
+        
+        if number_of_first_place > 1: 
+            winning_points = (winner_points + second_points)/number_of_first_place
+            second_place_points = 0
+        else:
+            winning_points = winner_points
+            second_place_points = second_points/number_of_second_place
 
         for score in week:
             points = score[0]
@@ -152,9 +160,11 @@ def calculate_points(scores, winner_points = 2, second_points = 1):
                 total_points[name] += winning_points
             elif points == second_place_score:
                 total_points[name] += second_place_points
+            else:
+                total_points[name] += 0
 
-    # formatting to remove .0 from whole numbers
-    total_points = {k: (int(v) if (v%1 == 0) else v) for k, v in dict(total_points).items() }
+    # formatting to remove .0 from whole numbers and rounds decimals to 2.dp
+    total_points = {k: (int(v) if (v%1 == 0) else np.round(v, 2)) for k, v in dict(total_points).items() }
 
     return total_points
 

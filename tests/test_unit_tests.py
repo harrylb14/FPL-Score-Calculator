@@ -70,6 +70,22 @@ def test_calculate_points_with_all_scores_draw():
 
     assert result ==  {'Test Score': 1, 'Test 2 Score': 1, 'Test 3 Score': 1}
 
+def test_calculate_points_with_multiple_scores_draw_first_place():
+    test_score_data = [
+        {'GameWeek': 1, 'Test Score': 71, 'Test 2 Score': 71, 'Test 3 Score': 71, 'Test 4 Score': 71, 'Test 5 Score': 70}, 
+    ]
+    result = calculate_points(test_score_data)
+
+    assert result ==  {'Test Score': 0.75, 'Test 2 Score': 0.75, 'Test 3 Score': 0.75, 'Test 4 Score': 0.75, 'Test 5 Score': 0}
+
+def test_calculate_points_with_multiple_scores_draw_second_place():
+    test_score_data = [
+        {'GameWeek': 1, 'Test Score': 75, 'Test 2 Score': 71, 'Test 3 Score': 71, 'Test 4 Score': 71, 'Test 5 Score': 70}, 
+    ]
+    result = calculate_points(test_score_data)
+
+    assert result ==  {'Test Score': 2, 'Test 2 Score': 0.33, 'Test 3 Score': 0.33, 'Test 4 Score': 0.33, 'Test 5 Score': 0}
+
 def test_get_live_scores(requests_mock): 
     requests_mock.get(f'https://fantasy.premierleague.com/api/event/1/live/', \
         json= {'elements':[{"stats": {"total_points":10}}, {"stats": {"total_points":15}}, {"stats": {"total_points":5}}]})

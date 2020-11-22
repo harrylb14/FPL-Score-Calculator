@@ -10,13 +10,13 @@ def test_index():
 
 def test_view_scores_boys():
     tester = app.test_client()
-    response = tester.post('/scores', data = {'groupname': 'boys'})
+    response = tester.post('/scores', data = {'groupname': 'boys'}, follow_redirects = True)
     assert response.status_code == 200
     assert 'JH Score' in str(response.data)
 
 def test_view_scores_ctl():
     tester = app.test_client()
-    response = tester.post('/scores', data = {'groupname': 'ctl'})
+    response = tester.post('/scores', data = {'groupname': 'ctl'}, follow_redirects = True)
     assert response.status_code == 200
     assert 'TomT Score' in str(response.data)
 

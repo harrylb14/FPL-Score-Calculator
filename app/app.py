@@ -86,27 +86,34 @@ def home():
 def page_not_found(e):
     return render_template('404.html'), 404
 
-@app.route("/scores", methods=['GET', 'POST', 'PUT'])
-def display_all_week_scores(): 
+@app.route('/scores', methods=['POST'])
+def direct_to_scores():
     req = request.form
-    group_name = req.get("groupname")
+    groupname = req.get("groupname").lower()
 
-    if group_name.lower() == 'boys':
-        player_list = player_list_boys
-    elif group_name.lower() == 'ctl':
-        player_list = player_list_ctl
-    else:
+    if groupname not in ['boys', 'ctl']:    #need to make general
         flash('No group with this name!', 'invalid group')
         return redirect(url_for('home'))
 
-    player_data = get_player_data(player_list)
+    return redirect(url_for('.display_all_week_scores', groupname = groupname))
+
+@app.route("/scores/<groupname>", methods=['GET', 'POST', 'PUT'])
+def display_all_week_scores(groupname):
+
+    if groupname == 'boys':
+        group = player_list_boys 
+    elif groupname == 'ctl':
+        group = player_list_ctl
+
+    player_data = get_player_data(group)
+
     if player_data == 'Updating':
         return render_template('updating.html')
     else: 
         player_scores = get_player_scores(player_data)
         weekly_scores = group_scores_by_week(player_scores)
         gameweek = len(weekly_scores)
-        live_scores = get_managers_live_gameweek_score(player_list, gameweek)
+        live_scores = get_managers_live_gameweek_score(group, gameweek)
         weekly_scores[-1] = live_scores
         # xx, yy = Counter(current_week), Counter(live_scores)
         # xx.update(yy)
@@ -119,7 +126,7 @@ def display_all_week_scores():
         winnings = calculate_winnings(total_points, gameweek)
 
     return render_template('full_scores.html', records=weekly_scores, colnames=colnames, 
-        scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings, groupname = group_name, live_scores = live_scores, gameweek = gameweek)
+        scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings, groupname = groupname, live_scores = live_scores, gameweek = gameweek)
 
 def calculate_total_scores(scores):
     scores = scores

@@ -20,7 +20,6 @@ def get_player_data(players):
         url = f'{fpl_api_base_url}/{team_id}/history/'
         r = requests.get(url)
         json = r.json()
-        print(json)
         if json == 'The game is being updated.':
             return 'Updating'
             
@@ -39,6 +38,7 @@ def get_managers_live_gameweek_score(managers, gameweek):
         team_id = manager['team_id']
         name = manager['name']
         current_week_players = requests.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
+        transfer_penalty = current_week_players['entry_history']['event_transfers_cost']
         player_list = current_week_players['picks']
   
         for player in player_list:
@@ -48,7 +48,7 @@ def get_managers_live_gameweek_score(managers, gameweek):
              
             score += int(player['multiplier'])*player_live_score
             
-        live_scores[f'{name} Score'] = score
+        live_scores[f'{name} Score'] = score - transfer_penalty
 
     return live_scores
 
@@ -106,11 +106,13 @@ def display_all_week_scores():
         weekly_scores = group_scores_by_week(player_scores)
         gameweek = len(weekly_scores)
         live_scores = get_managers_live_gameweek_score(player_list, gameweek)
-        current_week = weekly_scores[-1]
-        xx, yy = Counter(current_week), Counter(live_scores)
-        xx.update(yy)
-        updated_current_week = xx
-        weekly_scores[-1] = updated_current_week
+        live_scores['GameWeek'] = gameweek
+        # current_week = weekly_scores[-1]
+        # xx, yy = Counter(current_week), Counter(live_scores)
+        # xx.update(yy)
+        # updated_current_week = xx
+        # weekly_scores[-1] = updated_current_week
+        weekly_scores[-1] = live_scores
         total_scores = calculate_total_scores(weekly_scores)
         total_points = calculate_points(weekly_scores)
         colnames = [*(weekly_scores[0].keys())]
@@ -118,7 +120,7 @@ def display_all_week_scores():
         winnings = calculate_winnings(total_points, gameweek)
 
     return render_template('full_scores.html', records=weekly_scores, colnames=colnames, 
-        scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings, groupname = group_name, live_scores = live_scores)
+        scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings, groupname = group_name, live_scores = live_scores, gameweek = gameweek)
 
 def calculate_total_scores(scores):
     scores = scores

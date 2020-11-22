@@ -19,6 +19,12 @@
                 {% endfor %}
             </tr>
             {% endfor %}
+            <tr> 
+                <td> <b> Live GameWeek {{gameweek}} Score: </b></td>
+                {% for name in scorenames %}
+                    <td> {{live_scores[name]}}</td>
+                {% endfor %}
+            </tr>
             <tr>
                 <td> <b> Total: </b></td>
                 {% for player, score in totals.items() %}

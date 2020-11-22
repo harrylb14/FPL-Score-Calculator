@@ -75,9 +75,10 @@ def test_get_live_scores(requests_mock):
         json= {'elements':[{"stats": {"total_points":10}}, {"stats": {"total_points":15}}, {"stats": {"total_points":5}}]})
 
     requests_mock.get(f'{fpl_api_base_url}/111111/event/1/picks/', \
-        json= {'picks':[{'element': 1, 'multiplier': 1}, {'element': 2, 'multiplier': 2}, {'element': 3, 'multiplier': 1}]})
+        json= {'entry_history':{'event_transfers_cost': 4},
+            'picks':[{'element': 1, 'multiplier': 1}, {'element': 2, 'multiplier': 2}, {'element': 3, 'multiplier': 1}]})
 
     test_managers = [{'name': 'Test', 'team_id': '111111'}]
     live_scores = get_managers_live_gameweek_score(test_managers, 1)
 
-    assert live_scores == { 'Test Score': 45 }
+    assert live_scores == { 'Test Score': 41 }

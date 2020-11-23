@@ -129,6 +129,7 @@ def calculate_total_scores(scores):
 # manager points are allocated based on weekly performances. Winner_points are distributed 
 # amongst those in first place, and if there is only one winner, second place points 
 # are distributed amongst those in second place. 
+
 def calculate_manager_points(scores, winner_points = 2, second_points = 1):
     weekly_scores_sorted_descending = [
         sorted([(v, k) for k, v in week.items() if k[-6:] == " Score"], reverse=True)
@@ -141,6 +142,7 @@ def calculate_manager_points(scores, winner_points = 2, second_points = 1):
         score_distribution = Counter(score[0] for score in week)
         highest_score = week[0][0]
         number_of_first_place = score_distribution[highest_score]
+
         second_place_score = list(score_distribution)[1] if len(list(score_distribution)) > 1 else 0
         number_of_second_place = score_distribution[second_place_score] if len(list(score_distribution)) > 1 else 0
         
@@ -183,3 +185,4 @@ def calculate_winnings(manager_points, number_of_weeks):
 
 if __name__ == "__main__":
     app.run(debug = True)
+    

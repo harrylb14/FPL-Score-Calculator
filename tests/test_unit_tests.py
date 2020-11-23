@@ -1,6 +1,6 @@
 import requests
-from app.app import retrieve_manager_data, get_manager_scores, group_manager_scores_by_week, \
-    calculate_total_scores, calculate_manager_points, fpl_api_base_url, retrieve_managers_live_gameweek_score
+from app.app import retrieve_manager_data, retrieve_manager_scores_previous_gameweeks, group_manager_scores_by_week, \
+    calculate_total_scores, calculate_manager_points, fpl_api_base_url, retrieve_managers_scores_current_gameweek
 
 def test_retrieve_manager_data(requests_mock):
     test_player = [{'name': 'Test', 'team_id': '111111'}]
@@ -17,12 +17,12 @@ def test_retrieve_manager_data(requests_mock):
 
 #     assert resp == 'Updating'
 
-def test_get_manager_scores():
+def test_retrieve_manager_scores_previous_gameweeks():
     test_player_data = [
         {'name': 'Test', 'team_id': '111111', 'data': [{'event': 1, 'points': 71, 'event_transfers_cost': 0},{'event': 2, 'points': 50, 'event_transfers_cost': 0}]},
         {'name': 'Test 2', 'team_id': '111112', 'data': [{'event': 1, 'points': 30, 'event_transfers_cost': 4},{'event': 2, 'points': 80, 'event_transfers_cost': 0}]}
     ]
-    result = get_manager_scores(test_player_data)
+    result = retrieve_manager_scores_previous_gameweeks(test_player_data)
 
     assert result == [[{'GameWeek': 1, 'Test Score': 71}, {'GameWeek': 2, 'Test Score': 50}], [{'GameWeek': 1, 'Test 2 Score': 26}, {'GameWeek': 2, 'Test 2 Score': 80}]]
 
@@ -95,6 +95,6 @@ def test_get_live_scores(requests_mock):
             'picks':[{'element': 1, 'multiplier': 1}, {'element': 2, 'multiplier': 2}, {'element': 3, 'multiplier': 1}]})
 
     test_managers = [{'name': 'Test', 'team_id': '111111'}]
-    live_scores = retrieve_managers_live_gameweek_score(test_managers, 1)
+    live_scores = retrieve_managers_scores_current_gameweek(test_managers, 1)
 
     assert live_scores == { 'Test Score': 41 }

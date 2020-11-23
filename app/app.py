@@ -29,32 +29,30 @@ def retrieve_manager_data(managers):
     
     return managers
 
-def retrieve_managers_live_gameweek_score(managers, gameweek):
+def retrieve_managers_scores_current_gameweek(managers, gameweek):
     live_scores = {}
-
-    # retrieves the list of players owned by a manager
+    player_scores = requests.get(f'{live_scores_base_url}/{gameweek}/live/').json()
+    # retrieves the list of players owned by a manager in a given gameweek
     for manager in managers:
         score = 0
         team_id = manager['team_id']
         name = manager['name']
-        current_week_players = requests.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
-        transfer_penalty = current_week_players['entry_history']['event_transfers_cost']
-        player_list = current_week_players['picks']
+        current_gameweek_players = requests.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
+        transfer_penalty = current_gameweek_players['entry_history']['event_transfers_cost']
+        player_list = current_gameweek_players['picks']
 
         # gets the live score of each player and adds it to the total, including their multipler
-        for player in player_list:
-            player_scores = requests.get(f'{live_scores_base_url}/{gameweek}/live/').json()
+        for player in player_list:     
             player_id = player['element']
             player_data = player_scores['elements'][player_id - 1]
             player_live_score = player_data['stats']['total_points']
-             
             score += int(player['multiplier'])*player_live_score
             
         live_scores[f'{name} Score'] = score - transfer_penalty
 
     return live_scores
 
-def get_manager_scores(manager_data):
+def retrieve_manager_scores_previous_gameweeks(manager_data):
     manager_scores = []
 
     for manager in manager_data:
@@ -90,7 +88,8 @@ def direct_to_scores():
     req = request.form
     groupname = req.get("groupname").lower()
 
-    if not any(group['groupname'] == groupname for group in groups):    #search groups for groupname
+    #search groups for entered groupname
+    if not any(group['groupname'] == groupname for group in groups):    
         flash('No group with this name!', 'invalid group')
         return redirect(url_for('home'))
 
@@ -105,12 +104,13 @@ def display_all_scores(groupname):
     if manager_data == 'Updating':
         return render_template('updating.html')
     else: 
-        manager_scores = get_manager_scores(manager_data)
+        manager_scores = retrieve_manager_scores_previous_gameweeks(manager_data)
         weekly_scores = group_manager_scores_by_week(manager_scores)
         gameweek = len(weekly_scores)
-        live_scores = retrieve_managers_live_gameweek_score(manager_list, gameweek)
+        live_scores = retrieve_managers_scores_current_gameweek(manager_list, gameweek)
         total_scores = calculate_total_scores(weekly_scores)
         total_points = calculate_manager_points(weekly_scores)
+
         colnames = [*(weekly_scores[0].keys())]
         scorenames = colnames[1:]
         winnings = calculate_winnings(total_points, gameweek)
@@ -118,24 +118,23 @@ def display_all_scores(groupname):
     return render_template('full_scores.html', records=weekly_scores, colnames=colnames, 
         scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings, groupname = groupname, live_scores = live_scores, gameweek = gameweek)
 
+# totals scores of each gameweek 
 def calculate_total_scores(scores):
-    # totals scores of each gameweek 
     total_scores = dict(functools.reduce(operator.add, 
          map(collections.Counter, scores))) 
     del total_scores['GameWeek']
 
     return total_scores
 
+# manager points are allocated based on weekly performances. Winner_points are distributed 
+# amongst those in first place, and if there is only one winner, second place points 
+# are distributed amongst those in second place. 
 def calculate_manager_points(scores, winner_points = 2, second_points = 1):
     weekly_scores_sorted_descending = [
         sorted([(v, k) for k, v in week.items() if k[-6:] == " Score"], reverse=True)
         for week in scores
     ]
     total_manager_points = defaultdict(int)
-
-    # manager points are allocated based on weekly performances. Winner_points are distributed 
-    # amongst those in first place, and if there is only one winner, second place points 
-    # are distributed amongst those in second place. 
 
     for week in weekly_scores_sorted_descending:
 

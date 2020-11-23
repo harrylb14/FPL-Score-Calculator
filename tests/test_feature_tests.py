@@ -1,4 +1,4 @@
-from app.app import app, fpl_api_base_url, get_player_data
+from app.app import app, fpl_api_base_url, retrieve_manager_data
 from flask import Flask
 import requests
 

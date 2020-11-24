@@ -2,8 +2,8 @@ from flask import Flask, flash, redirect, render_template, \
      request, url_for
 import requests
 import numpy as np
-from collections import defaultdict, Counter
 import collections 
+from collections import defaultdict, Counter
 import functools 
 import operator 
 import os

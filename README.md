@@ -14,7 +14,8 @@ Next steps:
 #### To run this project: 
 ```
 pip3 install -r requirements.txt
-python3 app/app.py
+export FLASK_APP=app/app.py
+flask run
 ````
 Then navigate to localhost:5000. 
 Deployment to AWS coming imminently!

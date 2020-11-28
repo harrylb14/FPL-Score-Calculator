@@ -28,7 +28,7 @@
             <tr>
                 <td> <b> Total: </b></td>
                 {% for player, score in totals.items() %}
-                <td>{{ score }} </td>
+                <td>{{ score + live_scores[player] }} </td>
                 {% endfor %}
             </tr>
             <tr>

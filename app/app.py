@@ -110,6 +110,8 @@ def display_all_scores(groupname):
         live_scores = retrieve_managers_scores_current_gameweek(manager_list, gameweek)
         total_scores = calculate_total_scores(weekly_scores)
         total_points = calculate_manager_points(weekly_scores)
+        print(total_scores)
+        print(live_scores)
 
         colnames = [*(weekly_scores[0].keys())]
         scorenames = colnames[1:]
@@ -120,8 +122,9 @@ def display_all_scores(groupname):
 
 # totals scores of each gameweek 
 def calculate_total_scores(scores):
+    #map over weekscores apart from current week, which is added later via live score
     total_scores = dict(functools.reduce(operator.add, 
-         map(collections.Counter, scores))) 
+         map(collections.Counter, scores[:-1]))) 
     del total_scores['GameWeek']
 
     return total_scores

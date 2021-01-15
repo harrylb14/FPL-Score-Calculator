@@ -111,15 +111,14 @@ def display_all_scores(groupname):
         weekly_scores[-1] = live_scores
         total_scores = calculate_total_scores(weekly_scores)
         total_points = calculate_manager_points(weekly_scores)
-        print(total_scores)
-        print(live_scores)
 
         colnames = [*(weekly_scores[0].keys())]
         scorenames = colnames[1:]
         winnings = calculate_winnings(total_points, gameweek)
 
     return render_template('full_scores.html', records=weekly_scores, colnames=colnames, 
-        scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings, groupname = groupname, live_scores = live_scores, gameweek = gameweek)
+        scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings, 
+        groupname = groupname, live_scores = live_scores, gameweek = gameweek)
 
 # totals scores of each gameweek 
 def calculate_total_scores(scores):

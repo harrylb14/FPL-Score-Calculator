@@ -1,5 +1,5 @@
 groups = [
-            {'groupname': 'boys', 'managers': 
+            {'groupname': 'uni', 'managers': 
                 [
                 {'name': 'JH', 'team_id': '258789'},
                 {'name': 'Harry', 'team_id': '278724'},

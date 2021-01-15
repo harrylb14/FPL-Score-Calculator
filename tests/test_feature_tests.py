@@ -8,9 +8,9 @@ def test_index():
     assert response.status_code == 200
     assert 'Enter Group Name' in str(response.data)
 
-def test_view_scores_boys():
+def test_view_scores_uni():
     tester = app.test_client()
-    response = tester.post('/scores', data = {'groupname': 'boys'}, follow_redirects = True)
+    response = tester.post('/scores', data = {'groupname': 'uni'}, follow_redirects = True)
     assert response.status_code == 200
     assert 'JH Score' in str(response.data)
 

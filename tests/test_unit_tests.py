@@ -2,18 +2,10 @@ import requests
 from app.app import retrieve_manager_data, retrieve_manager_scores_previous_gameweeks, group_manager_scores_by_week, \
     calculate_total_scores, calculate_manager_points, fpl_api_base_url, retrieve_managers_scores_current_gameweek
 
-def test_retrieve_manager_data(requests_mock):
-    test_player = [{'name': 'Test', 'team_id': '111111'}]
-    requests_mock.get(f'{fpl_api_base_url}/111111/history/', json= {'current':{'data': 'mock_data'}})
-    resp = retrieve_manager_data(test_player)
-
-    assert resp == [{'name': 'Test', 'team_id': '111111', 'data': {'data': 'mock_data'}}]
-
 # def test_scores_updating_page(requests_mock):
 #     test_player = [{'name': 'Test', 'team_id': '11111'}]
 #     requests_mock.get(f'{fpl_api_base_url}/11111/history/', json={"The game is being updated."})
 #     resp = retrieve_manager_data(test_player)
-#     print(resp)
 
 #     assert resp == 'Updating'
 
@@ -86,6 +78,13 @@ def test_calculate_manager_points_with_multiple_scores_draw_second_place():
 
     assert result ==  {'Test Score': 2, 'Test 2 Score': 0.33, 'Test 3 Score': 0.33, 'Test 4 Score': 0.33, 'Test 5 Score': 0}
 
+def test_retrieve_manager_data(requests_mock):
+    test_player = [{'name': 'Test', 'team_id': '111111'}]
+    requests_mock.get(f'{fpl_api_base_url}/111111/history/', json= {'current':{'data': 'mock_data'}})
+    resp = retrieve_manager_data(test_player)
+
+    assert resp == [{'name': 'Test', 'team_id': '111111', 'data': {'data': 'mock_data'}}]
+    
 def test_get_live_scores(requests_mock): 
     requests_mock.get(f'https://fantasy.premierleague.com/api/event/1/live/', \
         json= {'elements':[{"stats": {"total_points":10}}, {"stats": {"total_points":15}}, {"stats": {"total_points":5}}]})

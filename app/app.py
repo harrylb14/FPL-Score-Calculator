@@ -97,7 +97,8 @@ def retrieve_chip_information(manager_data):
             if chip_type == 'wildcard':
                 chip_type = 'Wildcard'
             elif chip_type == 'bboost':
-                chip_type = 'Bench Boost'
+                score = calculate_bench_boost_score(chip_week, manager)
+                chip_type = f'Bench Boost: {score}'
             elif chip_type == '3xc':
                 chip_type = 'Triple Captain'
             elif chip_type == 'freehit':
@@ -219,6 +220,20 @@ def calculate_winnings(manager_points, number_of_weeks):
         winnings[player] = cash_score
 
     return dict(winnings)
+
+def calculate_bench_boost_score(gameweek, manager):
+    player_scores = requests.get(f'{live_scores_base_url}/{gameweek}/live/').json()
+    team_id = manager['team_id']
+    name = manager['name']
+    gameweek_players = requests.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
+    player_list = gameweek_players['picks']
+    bench_score = 0
+    for player in player_list[11:]:
+        player_id = player['element']
+        player_data = player_scores['elements'][player_id - 1]
+        player_live_score = player_data['stats']['total_points']
+        bench_score += int(player['multiplier'])*player_live_score
+    return bench_score
 
 if __name__ == "__main__":
     app.run(debug = True)

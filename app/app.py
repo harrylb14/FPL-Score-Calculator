@@ -103,7 +103,8 @@ def retrieve_chip_information(manager_data):
                 score = calculate_captain_score(chip_week, manager)
                 chip_type = f'Triple Captain {score[0]}: {score[1] * 3}'
             elif chip_type == 'freehit':
-                chip_type = 'Free Hit'
+                score = calculate_free_hit_score(chip_week, manager)
+                chip_type = f'Free Hit: {score}'
 
             chip_information[chip_week - 1][f'{name} Score'] = chip_type
 
@@ -249,10 +250,25 @@ def calculate_captain_score(gameweek, manager):
     for player in player_data['elements']:
         if player['id'] == captain_id:
             captain_name = player['web_name']
-            print(captain_name)
             break
 
     return [captain_name, captain_score]
+
+def calculate_free_hit_score(gameweek, manager):
+    week_score = manager['data'][gameweek - 1]['points']
+    team_id = manager['team_id']
+    score_no_free_hit = 0 
+    original_team = requests.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek - 1}/picks/').json()
+    player_scores = requests.get(f'{live_scores_base_url}/{gameweek}/live/').json()
+    original_players = original_team['picks']
+
+    for player in original_players:     
+        player_id = player['element']
+        player_data = player_scores['elements'][player_id - 1]
+        player_live_score = player_data['stats']['total_points']
+        score_no_free_hit += int(player['multiplier'])*player_live_score
+
+    return week_score - score_no_free_hit
 
 if __name__ == "__main__":
     app.run(debug = True)

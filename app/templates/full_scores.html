@@ -15,7 +15,9 @@
             {% for record in records[:-1] %}
             <tr>   
                 {% for col in colnames %}       
-                <td>{{ record[col] }} <br> <span id='chip'>{{ chips[record['GameWeek'] - 1][col] }}</span> </td>
+                <td> {{ record[col] }} <br> 
+                    <span id='chip'>{{ captains[record['GameWeek'] - 1][col] }} <br>
+                        {{ chips[record['GameWeek'] - 1][col] }}</span> </td>
                 {% endfor %}
             </tr>
             {% endfor %}

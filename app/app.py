@@ -8,6 +8,7 @@ import functools
 import operator 
 import os
 from .groups import groups
+from .captains import captains
 
 
 app = Flask(__name__)
@@ -110,7 +111,22 @@ def retrieve_chip_information(manager_data):
 
     return chip_information 
             
+def retrieve_captain_information(manager_data):
+    captain_information = []
+    for week in manager_data[0]['data']:
+        week_captains = {}
+        gameweek = week['event']
+        for manager in manager_data:
+            name = manager['name']
+            captain = calculate_captain_score(gameweek, manager)
+            captain_name = captain[0]
+            captain_score = captain[1]
+            captain_string = f'{captain_name}: {captain_score}'
+            week_captains[f'{name} Score'] = captain_string
 
+        captain_information.append(week_captains)
+
+    return captain_information
 
 @app.route("/", methods=['GET', 'POST', 'PUT'])
 def home():
@@ -144,6 +160,7 @@ def display_all_scores(groupname):
         manager_scores = retrieve_manager_scores_previous_gameweeks(manager_data)
         weekly_scores = group_manager_scores_by_week(manager_scores)
         chip_information = retrieve_chip_information(manager_data)
+        captains = retrieve_captain_information(manager_data)
         gameweek = len(weekly_scores)
         live_scores = retrieve_managers_scores_current_gameweek(manager_list, gameweek)
         weekly_scores[-1] = live_scores
@@ -154,7 +171,7 @@ def display_all_scores(groupname):
         scorenames = colnames[1:]
         winnings = calculate_winnings(total_points, gameweek)
 
-    return render_template('full_scores.html', records=weekly_scores, chips=chip_information, colnames=colnames, 
+    return render_template('full_scores.html', records=weekly_scores, captains=captains, chips=chip_information, colnames=colnames, 
         scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings, 
         groupname = groupname, live_scores = live_scores, gameweek = gameweek)
 
@@ -244,15 +261,19 @@ def calculate_captain_score(gameweek, manager):
     for player in player_list: 
         if player['multiplier'] == 2 or player['multiplier'] == 3:
             captain_id = player['element']
+
     captain_data = player_scores['elements'][captain_id - 1]
     captain_score = captain_data['stats']['total_points']
-    player_data = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
-    for player in player_data['elements']:
-        if player['id'] == captain_id:
-            captain_name = player['web_name']
-            break
 
-    return [captain_name, captain_score]
+    for captain in captains: 
+        if captain_id == captain['id']:
+            captain_name = captain['name']
+            return [captain_name, captain_score]
+               
+    player_data = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
+    captain = [player for player in player_data['elements'] if player['id'] == captain_id][0]
+    print(captain['web_name'])
+    return [captain['web_name'], captain_score]
 
 def calculate_free_hit_score(gameweek, manager):
     week_score = manager['data'][gameweek - 1]['points']

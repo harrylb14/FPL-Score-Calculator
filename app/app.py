@@ -75,6 +75,34 @@ def group_manager_scores_by_week(manager_scores):
 
     return scores_grouped_by_week
 
+def retrieve_chip_information(scores_grouped_by_week, manager_data):
+    weekly_chip_information = []
+    for week in scores_grouped_by_week:
+        week_chips = {}
+        for manager in manager_data:
+            gameweek = week['GameWeek']
+            team_id = manager['team_id']
+            name = manager['name']
+            week_chips['Gameweek'] = gameweek
+            active_chip = requests.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()['active_chip']
+            if active_chip == 'wildcard':
+                active_chip = 'Wildcard'
+            elif active_chip == 'bboost':
+                active_chip = 'Bench Boost'
+            elif active_chip == '3xc':
+                active_chip = 'Triple Captain'
+            elif active_chip == 'freehit':
+                active_chip = 'Free Hit'
+            else:
+                active_chip = ''
+
+            week_chips[f'{name} Score'] = active_chip
+        
+        weekly_chip_information.append(week_chips)
+    
+    return weekly_chip_information
+
+
 @app.route("/", methods=['GET', 'POST', 'PUT'])
 def home():
     return render_template('index.html')
@@ -106,6 +134,7 @@ def display_all_scores(groupname):
     else: 
         manager_scores = retrieve_manager_scores_previous_gameweeks(manager_data)
         weekly_scores = group_manager_scores_by_week(manager_scores)
+        chip_information = retrieve_chip_information(weekly_scores, manager_data)
         gameweek = len(weekly_scores)
         live_scores = retrieve_managers_scores_current_gameweek(manager_list, gameweek)
         weekly_scores[-1] = live_scores
@@ -116,7 +145,7 @@ def display_all_scores(groupname):
         scorenames = colnames[1:]
         winnings = calculate_winnings(total_points, gameweek)
 
-    return render_template('full_scores.html', records=weekly_scores, colnames=colnames, 
+    return render_template('full_scores.html', records=weekly_scores, chips=chip_information, colnames=colnames, 
         scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings, 
         groupname = groupname, live_scores = live_scores, gameweek = gameweek)
 

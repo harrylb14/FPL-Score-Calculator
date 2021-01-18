@@ -14,20 +14,34 @@
         <tbody>
             {% for record in records[:-1] %}
             <tr>   
-                {% for col in colnames %}       
-                <td> {{ record[col] }} <br> 
-                    <span id='chip'>{{ captains[record['GameWeek'] - 1][col] }} <br>
-                        {{ chips[record['GameWeek'] - 1][col] }}</span> </td>
+                <td> {{ record['GameWeek'] }} </td>
+                {% for col in colnames[1:] %}       
+                <td><span id='score'>
+                        {{ record[col] }} <br>
+                </span>  
+                    <span id='captain'>
+                        {{ captains[record['GameWeek'] - 1][col] }} <br>
+                    </span>
+                    <span id='chip'>
+                        {{ chips[record['GameWeek'] - 1][col] }}
+                    </span> 
+                </td>
                 {% endfor %}
             </tr>
             {% endfor %}
             <tr> 
                 <td> <b> Live GameWeek {{gameweek}} Score: </b></td>
                 {% for name in scorenames %}
-                    <td> {{live_scores[name] }} <br> 
-                        <span id='chip'> 
+                    <td><span id='score'>
+                            {{live_scores[name] }} <br> 
+                        </span>
+                        <span id='captain'> 
                             {{ captains[-1][name] }}  <br>
-                            {{ chips[gameweek - 1][name] }} </span> </td>
+                        </span>
+                        <span id='chip'>
+                           {{ chips[gameweek - 1][name] }} 
+                        </span> 
+                    </td>
                 {% endfor %}
             </tr>
             <tr>

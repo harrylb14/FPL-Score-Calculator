@@ -81,6 +81,7 @@ def group_manager_scores_by_week(manager_scores):
 def retrieve_chip_information(manager_data):
     chip_information = []
     gameweeks_passed = len(manager_data[0]['data'])
+    player_data = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
     for week in range(1,gameweeks_passed+1):
         week_chips={}
         for manager in manager_data:
@@ -95,13 +96,14 @@ def retrieve_chip_information(manager_data):
         for chip in chips:
             chip_week = chip['event']
             chip_type = chip['name']
+            player_scores = requests.get(f'{live_scores_base_url}/{chip_week}/live/').json()
             if chip_type == 'wildcard':
                 chip_type = 'Wildcard'
             elif chip_type == 'bboost':
                 score = calculate_bench_boost_score(chip_week, manager)
                 chip_type = f'Bench Boost: {score}'
             elif chip_type == '3xc':
-                score = calculate_captain_score(chip_week, manager)
+                score = calculate_captain_score(chip_week, manager, player_scores, player_data)
                 chip_type = f'Triple Captain {score[0]}: {score[1] * 3}'
             elif chip_type == 'freehit':
                 score = calculate_free_hit_score(chip_week, manager)
@@ -113,11 +115,13 @@ def retrieve_chip_information(manager_data):
             
 def retrieve_captain_information(manager_data):
     captain_information = []
+    player_data = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
     for week in range(1, len(manager_data[0]['data']) + 1):
+        player_scores = requests.get(f'{live_scores_base_url}/{week}/live/').json()
         week_captains = {}
         for manager in manager_data:
             name = manager['name']
-            captain = calculate_captain_score(week, manager)
+            captain = calculate_captain_score(week, manager, player_scores, player_data)
             captain_name = captain[0]
             captain_score = captain[1]
             captain_string = f'{captain_name}: {captain_score}'
@@ -252,8 +256,7 @@ def calculate_bench_boost_score(gameweek, manager):
         bench_score += int(player['multiplier'])*player_live_score
     return bench_score
 
-def calculate_captain_score(gameweek, manager):
-    player_scores = requests.get(f'{live_scores_base_url}/{gameweek}/live/').json()
+def calculate_captain_score(gameweek, manager, player_scores, player_data):
     team_id = manager['team_id']
     gameweek_players = requests.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
     player_list = gameweek_players['picks']
@@ -270,7 +273,7 @@ def calculate_captain_score(gameweek, manager):
             captain_name = captain['name']
             return [captain_name, captain_score]
                
-    player_data = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
+    
     captain = [player for player in player_data['elements'] if player['id'] == captain_id][0]
 
     return [captain['web_name'], captain_score]

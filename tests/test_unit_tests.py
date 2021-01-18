@@ -80,10 +80,10 @@ def test_calculate_manager_points_with_multiple_scores_draw_second_place():
 
 def test_retrieve_manager_data(requests_mock):
     test_player = [{'name': 'Test', 'team_id': '111111'}]
-    requests_mock.get(f'{fpl_api_base_url}/111111/history/', json= {'current':{'data': 'mock_data'}})
+    requests_mock.get(f'{fpl_api_base_url}/111111/history/', json= {'current':{'data': 'mock_data'}, 'chips': 'mock_chips'})
     resp = retrieve_manager_data(test_player)
 
-    assert resp == [{'name': 'Test', 'team_id': '111111', 'data': {'data': 'mock_data'}}]
+    assert resp == [{'name': 'Test', 'team_id': '111111', 'data': {'data': 'mock_data', }, 'chips': 'mock_chips'}]
     
 def test_get_live_scores(requests_mock): 
     requests_mock.get(f'https://fantasy.premierleague.com/api/event/1/live/', \

@@ -25,7 +25,9 @@ def retrieve_manager_data(managers):
             return 'Updating'
             
         data = json['current']
+        chips = json['chips']
         manager['data'] = data
+        manager['chips'] = chips
     
     return managers
 
@@ -75,32 +77,36 @@ def group_manager_scores_by_week(manager_scores):
 
     return scores_grouped_by_week
 
-def retrieve_chip_information(scores_grouped_by_week, manager_data):
-    weekly_chip_information = []
-    for week in scores_grouped_by_week:
-        week_chips = {}
+def retrieve_chip_information(manager_data):
+    chip_information = []
+    gameweeks_passed = len(manager_data[0]['data'])
+    for week in range(1,gameweeks_passed+1):
+        week_chips={}
         for manager in manager_data:
-            gameweek = week['GameWeek']
-            team_id = manager['team_id']
             name = manager['name']
-            week_chips['Gameweek'] = gameweek
-            active_chip = requests.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()['active_chip']
-            if active_chip == 'wildcard':
-                active_chip = 'Wildcard'
-            elif active_chip == 'bboost':
-                active_chip = 'Bench Boost'
-            elif active_chip == '3xc':
-                active_chip = 'Triple Captain'
-            elif active_chip == 'freehit':
-                active_chip = 'Free Hit'
-            else:
-                active_chip = ''
+            week_chips[f'{name} Score'] = ''
 
-            week_chips[f'{name} Score'] = active_chip
-        
-        weekly_chip_information.append(week_chips)
-    
-    return weekly_chip_information
+        chip_information.append(week_chips)
+
+    for manager in manager_data:
+        name = manager['name']
+        chips = manager['chips']
+        for chip in chips:
+            chip_week = chip['event']
+            chip_type = chip['name']
+            if chip_type == 'wildcard':
+                chip_type = 'Wildcard'
+            elif chip_type == 'bboost':
+                chip_type = 'Bench Boost'
+            elif chip_type == '3xc':
+                chip_type = 'Triple Captain'
+            elif chip_type == 'freehit':
+                chip_type = 'Free Hit'
+
+            chip_information[chip_week - 1][f'{name} Score'] = chip_type
+
+    return chip_information 
+            
 
 
 @app.route("/", methods=['GET', 'POST', 'PUT'])
@@ -134,7 +140,7 @@ def display_all_scores(groupname):
     else: 
         manager_scores = retrieve_manager_scores_previous_gameweeks(manager_data)
         weekly_scores = group_manager_scores_by_week(manager_scores)
-        chip_information = retrieve_chip_information(weekly_scores, manager_data)
+        chip_information = retrieve_chip_information(manager_data)
         gameweek = len(weekly_scores)
         live_scores = retrieve_managers_scores_current_gameweek(manager_list, gameweek)
         weekly_scores[-1] = live_scores

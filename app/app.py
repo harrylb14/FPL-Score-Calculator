@@ -113,12 +113,11 @@ def retrieve_chip_information(manager_data):
             
 def retrieve_captain_information(manager_data):
     captain_information = []
-    for week in manager_data[0]['data']:
+    for week in range(1, len(manager_data[0]['data']) + 1):
         week_captains = {}
-        gameweek = week['event']
         for manager in manager_data:
             name = manager['name']
-            captain = calculate_captain_score(gameweek, manager)
+            captain = calculate_captain_score(week, manager)
             captain_name = captain[0]
             captain_score = captain[1]
             captain_string = f'{captain_name}: {captain_score}'
@@ -261,6 +260,7 @@ def calculate_captain_score(gameweek, manager):
     for player in player_list: 
         if player['multiplier'] == 2 or player['multiplier'] == 3:
             captain_id = player['element']
+            break
 
     captain_data = player_scores['elements'][captain_id - 1]
     captain_score = captain_data['stats']['total_points']
@@ -272,7 +272,7 @@ def calculate_captain_score(gameweek, manager):
                
     player_data = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
     captain = [player for player in player_data['elements'] if player['id'] == captain_id][0]
-    print(captain['web_name'])
+
     return [captain['web_name'], captain_score]
 
 def calculate_free_hit_score(gameweek, manager):

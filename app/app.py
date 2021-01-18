@@ -100,8 +100,8 @@ def retrieve_chip_information(manager_data):
                 score = calculate_bench_boost_score(chip_week, manager)
                 chip_type = f'Bench Boost: {score}'
             elif chip_type == '3xc':
-                score = calculate_captain_score(chip_week, manager)*3
-                chip_type = f'Triple Captain: {score}'
+                score = calculate_captain_score(chip_week, manager)
+                chip_type = f'Triple Captain {score[0]}: {score[1] * 3}'
             elif chip_type == 'freehit':
                 chip_type = 'Free Hit'
 
@@ -245,8 +245,14 @@ def calculate_captain_score(gameweek, manager):
             captain_id = player['element']
     captain_data = player_scores['elements'][captain_id - 1]
     captain_score = captain_data['stats']['total_points']
+    player_data = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
+    for player in player_data['elements']:
+        if player['id'] == captain_id:
+            captain_name = player['web_name']
+            print(captain_name)
+            break
 
-    return captain_score
+    return [captain_name, captain_score]
 
 if __name__ == "__main__":
     app.run(debug = True)

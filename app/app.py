@@ -100,7 +100,8 @@ def retrieve_chip_information(manager_data):
                 score = calculate_bench_boost_score(chip_week, manager)
                 chip_type = f'Bench Boost: {score}'
             elif chip_type == '3xc':
-                chip_type = 'Triple Captain'
+                score = calculate_captain_score(chip_week, manager)*3
+                chip_type = f'Triple Captain: {score}'
             elif chip_type == 'freehit':
                 chip_type = 'Free Hit'
 
@@ -224,7 +225,6 @@ def calculate_winnings(manager_points, number_of_weeks):
 def calculate_bench_boost_score(gameweek, manager):
     player_scores = requests.get(f'{live_scores_base_url}/{gameweek}/live/').json()
     team_id = manager['team_id']
-    name = manager['name']
     gameweek_players = requests.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
     player_list = gameweek_players['picks']
     bench_score = 0
@@ -234,6 +234,19 @@ def calculate_bench_boost_score(gameweek, manager):
         player_live_score = player_data['stats']['total_points']
         bench_score += int(player['multiplier'])*player_live_score
     return bench_score
+
+def calculate_captain_score(gameweek, manager):
+    player_scores = requests.get(f'{live_scores_base_url}/{gameweek}/live/').json()
+    team_id = manager['team_id']
+    gameweek_players = requests.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
+    player_list = gameweek_players['picks']
+    for player in player_list: 
+        if player['multiplier'] == 2 or player['multiplier'] == 3:
+            captain_id = player['element']
+    captain_data = player_scores['elements'][captain_id - 1]
+    captain_score = captain_data['stats']['total_points']
+
+    return captain_score
 
 if __name__ == "__main__":
     app.run(debug = True)

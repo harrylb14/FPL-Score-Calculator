@@ -16,6 +16,7 @@ app.secret_key = os.urandom(24)
 fpl_api_base_url = 'https://fantasy.premierleague.com/api/entry'
 live_scores_base_url = 'https://fantasy.premierleague.com/api/event'
 
+
 def retrieve_manager_data(managers): 
     for manager in managers:
         team_id = manager['team_id']
@@ -31,6 +32,7 @@ def retrieve_manager_data(managers):
         manager['chips'] = chips
     
     return managers
+
 
 def retrieve_managers_scores_current_gameweek(managers, gameweek):
     live_scores = {}
@@ -55,6 +57,7 @@ def retrieve_managers_scores_current_gameweek(managers, gameweek):
 
     return live_scores
 
+
 def retrieve_manager_scores_previous_gameweeks(manager_data):
     manager_scores = []
 
@@ -67,6 +70,7 @@ def retrieve_manager_scores_previous_gameweeks(manager_data):
    
     return manager_scores
 
+
 def group_manager_scores_by_week(manager_scores):
     array_of_week_scores = list(map(list, zip(*manager_scores)))
     scores_grouped_by_week = []
@@ -77,6 +81,7 @@ def group_manager_scores_by_week(manager_scores):
         scores_grouped_by_week.append(wk)
 
     return scores_grouped_by_week
+
 
 def retrieve_chip_information(manager_data):
     chip_information = []
@@ -112,7 +117,8 @@ def retrieve_chip_information(manager_data):
             chip_information[chip_week - 1][f'{name} Score'] = chip_type
 
     return chip_information 
-            
+
+
 def retrieve_captain_information(manager_data):
     captain_information = []
     player_data = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
@@ -131,13 +137,16 @@ def retrieve_captain_information(manager_data):
 
     return captain_information
 
+
 @app.route("/", methods=['GET', 'POST', 'PUT'])
 def home():
     return render_template('index.html')
 
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
 
 @app.route('/scores', methods=['POST'])
 def direct_to_scores():
@@ -150,6 +159,7 @@ def direct_to_scores():
         return redirect(url_for('home'))
 
     return redirect(url_for('.display_all_scores', groupname = groupname))
+
 
 @app.route("/scores/<groupname>", methods=['GET', 'POST', 'PUT'])
 def display_all_scores(groupname):
@@ -178,6 +188,7 @@ def display_all_scores(groupname):
         scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings, 
         groupname = groupname, live_scores = live_scores, gameweek = gameweek)
 
+
 # totals scores of each gameweek 
 def calculate_total_scores(scores):
     total_scores = dict(functools.reduce(operator.add, 
@@ -189,6 +200,7 @@ def calculate_total_scores(scores):
 # manager points are allocated based on weekly performances. Winner_points are distributed 
 # amongst those in first place, and if there is only one winner, second place points 
 # are distributed amongst those in second place. 
+
 
 def calculate_manager_points(scores, winner_points = 2, second_points = 1):
     weekly_scores_sorted_descending = [
@@ -224,9 +236,10 @@ def calculate_manager_points(scores, winner_points = 2, second_points = 1):
                 total_manager_points[name] += 0
 
     # formatting to remove .0 from whole numbers and rounds decimals to 2.dp
-    total_manager_points = {k: (int(v) if (v%1 == 0) else np.round(v, 2)) for k, v in dict(total_manager_points).items() }
+    total_manager_points = {k: (int(v) if (v % 1 == 0) else np.round(v, 2)) for k, v in dict(total_manager_points).items() }
 
     return total_manager_points
+
 
 # winnings are calculated as number of manager points minus number of gameweeks passed 
 def calculate_winnings(manager_points, number_of_weeks):
@@ -243,6 +256,7 @@ def calculate_winnings(manager_points, number_of_weeks):
 
     return dict(winnings)
 
+
 def calculate_bench_boost_score(gameweek, manager):
     player_scores = requests.get(f'{live_scores_base_url}/{gameweek}/live/').json()
     team_id = manager['team_id']
@@ -255,6 +269,7 @@ def calculate_bench_boost_score(gameweek, manager):
         player_live_score = player_data['stats']['total_points']
         bench_score += int(player['multiplier'])*player_live_score
     return bench_score
+
 
 def calculate_captain_score(gameweek, manager, player_scores, player_data):
     team_id = manager['team_id']
@@ -272,11 +287,11 @@ def calculate_captain_score(gameweek, manager, player_scores, player_data):
         if captain_id == captain['id']:
             captain_name = captain['name']
             return [captain_name, captain_score]
-               
-    
+
     captain = [player for player in player_data['elements'] if player['id'] == captain_id][0]
 
     return [captain['web_name'], captain_score]
+
 
 def calculate_free_hit_score(gameweek, manager):
     week_score = manager['data'][gameweek - 1]['points']
@@ -294,6 +309,7 @@ def calculate_free_hit_score(gameweek, manager):
 
     return week_score - score_no_free_hit
 
+
 if __name__ == "__main__":
-    app.run(debug = True)
+    app.run(debug=True)
     

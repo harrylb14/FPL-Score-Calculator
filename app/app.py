@@ -202,7 +202,7 @@ def calculate_total_scores(scores):
 # are distributed amongst those in second place. 
 
 
-def calculate_manager_points(scores, winner_points = 2, second_points = 1):
+def calculate_manager_points(scores, winner_points=2.5, second_points=1.5, third_points=1):
     weekly_scores_sorted_descending = [
         sorted([(v, k) for k, v in week.items() if k[-6:] == " Score"], reverse=True)
         for week in scores
@@ -217,21 +217,40 @@ def calculate_manager_points(scores, winner_points = 2, second_points = 1):
 
         second_place_score = list(score_distribution)[1] if len(list(score_distribution)) > 1 else 0
         number_of_second_place = score_distribution[second_place_score] if len(list(score_distribution)) > 1 else 0
-        
-        if number_of_first_place > 1: 
+
+        third_place_score = list(score_distribution)[2] if len(list(score_distribution)) > 2 else 0
+        number_of_third_place = score_distribution[third_place_score] if len(list(score_distribution)) > 2 else 0
+
+        if number_of_first_place > 2:
+            winning_points = (winner_points + second_points + third_points)/number_of_first_place
+            second_place_points = third_place_points = 0
+        elif number_of_first_place == 2:
             winning_points = (winner_points + second_points)/number_of_first_place
-            second_place_points = 0
+            second_place_points = third_points/number_of_second_place
+            third_place_points = 0
         else:
             winning_points = winner_points
             second_place_points = second_points/number_of_second_place
+            third_place_points = third_points/number_of_third_place if number_of_second_place == 1 else 0
+
+        # if number_of_first_place > 1:
+        #     winning_points = (winner_points + second_points)/number_of_first_place
+        #     second_place_points = 0
+        # else:
+        #     winning_points = winner_points
+        #     second_place_points = second_points/number_of_second_place
+
+
 
         for score in week:
             points = score[0]
             name = score[1]
-            if points == highest_score: 
+            if points == highest_score:
                 total_manager_points[name] += winning_points
             elif points == second_place_score:
                 total_manager_points[name] += second_place_points
+            elif points == third_place_score:
+                total_manager_points[name] += third_place_points
             else:
                 total_manager_points[name] += 0
 

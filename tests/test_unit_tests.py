@@ -1,4 +1,5 @@
 import requests
+import pytest
 from app.app import retrieve_manager_data, retrieve_manager_scores_previous_gameweeks, group_manager_scores_by_week, \
     calculate_total_scores, calculate_manager_points, fpl_api_base_url, retrieve_managers_scores_current_gameweek
 
@@ -29,54 +30,77 @@ def test_group_manager_scores_by_week():
 
 def test_calculate_total_scores():
     test_score_data = [
-        {'GameWeek': 1, 'Test Score': 71, 'Test 2 Score': 26}, 
+        {'GameWeek': 1, 'Test Score': 71, 'Test 2 Score': 26},
         {'GameWeek': 2, 'Test Score': 50, 'Test 2 Score': 80}
     ]
     result = calculate_total_scores(test_score_data)
 
     assert result == {'Test Score': 121, 'Test 2 Score': 106}
+#
+# def test_calculate_manager_points_no_draw():
+#     test_score_data = [
+#         {'GameWeek': 1, 'Test Score': 71, 'Test 2 Score': 26, 'Test 3 Score': 70},
+#         {'GameWeek': 2, 'Test Score': 50, 'Test 2 Score': 80, 'Test 3 Score': 30}
+#     ]
+#     result = calculate_manager_points(test_score_data)
+#
+#     assert result ==  {'Test Score': 3, 'Test 2 Score': 2, 'Test 3 Score': 1}
+#
+# def test_calculate_manager_points_with_draw():
+#     test_score_data = [
+#         {'GameWeek': 1, 'Test Score': 71, 'Test 2 Score': 71, 'Test 3 Score': 70},
+#         {'GameWeek': 2, 'Test Score': 50, 'Test 2 Score': 80, 'Test 3 Score': 50}
+#     ]
+#     result = calculate_manager_points(test_score_data)
+#
+#     assert result ==  {'Test Score': 2, 'Test 2 Score': 3.5, 'Test 3 Score': 0.5}
+#
+# def test_calculate_manager_points_with_all_scores_draw():
+#     test_score_data = [
+#         {'GameWeek': 1, 'Test Score': 71, 'Test 2 Score': 71, 'Test 3 Score': 71},
+#     ]
+#     result = calculate_manager_points(test_score_data)
+#
+#     assert result ==  {'Test Score': 1, 'Test 2 Score': 1, 'Test 3 Score': 1}
 
-def test_calculate_manager_points_no_draw():
-    test_score_data = [
-        {'GameWeek': 1, 'Test Score': 71, 'Test 2 Score': 26, 'Test 3 Score': 70}, 
-        {'GameWeek': 2, 'Test Score': 50, 'Test 2 Score': 80, 'Test 3 Score': 30}
-    ]
+
+@pytest.mark.parametrize('scores, expected_points', [
+    ([5, 4, 3, 2, 1], [2.5, 1.5, 1, 0, 0]),
+    ([5, 5, 4, 3, 2], [2, 2, 1, 0, 0]),
+    ([5, 5, 5, 3, 2], [1.67, 1.67, 1.67, 0, 0]),
+    ([5, 5, 5, 5, 5], [1, 1, 1, 1, 1]),
+    ([5, 4, 4, 3, 2], [2.5, 0.75, 0.75, 0, 0]),
+    ([5, 4, 4, 4, 3], [2.5, 0.5, 0.5, 0.5, 0, 0]),
+    ([5, 4, 4, 4, 4], [2.5, 0.38, 0.38, 0.38, 0.38]),
+    ([5, 5, 4, 4, 3], [2, 2, 0.5, 0.5, 0]),
+    ([5, 4, 3, 3, 3], [2.5, 1.5, 0.33, 0.33, 0.33])
+])
+def test_calculate_manager_points(scores, expected_points):
+    test_score_data = [{'GameWeek': 1, 'Test Score': scores[0], 'Test 2 Score': scores[1], 'Test 3 Score': scores[2],
+                        'Test 4 Score': scores[3], 'Test 5 Score': scores[4]}]
     result = calculate_manager_points(test_score_data)
 
-    assert result ==  {'Test Score': 3, 'Test 2 Score': 2, 'Test 3 Score': 1}
+    assert result == {'Test Score': expected_points[0], 'Test 2 Score': expected_points[1],
+                      'Test 3 Score': expected_points[2], 'Test 4 Score': expected_points[3],
+                      'Test 5 Score': expected_points[4]}
 
-def test_calculate_manager_points_with_draw():
-    test_score_data = [
-        {'GameWeek': 1, 'Test Score': 71, 'Test 2 Score': 71, 'Test 3 Score': 70}, 
-        {'GameWeek': 2, 'Test Score': 50, 'Test 2 Score': 80, 'Test 3 Score': 50}
-    ]
-    result = calculate_manager_points(test_score_data)
 
-    assert result ==  {'Test Score': 2, 'Test 2 Score': 3.5, 'Test 3 Score': 0.5}
 
-def test_calculate_manager_points_with_all_scores_draw():
-    test_score_data = [
-        {'GameWeek': 1, 'Test Score': 71, 'Test 2 Score': 71, 'Test 3 Score': 71}, 
-    ]
-    result = calculate_manager_points(test_score_data)
-
-    assert result ==  {'Test Score': 1, 'Test 2 Score': 1, 'Test 3 Score': 1}
-
-def test_calculate_manager_points_with_multiple_scores_draw_first_place():
-    test_score_data = [
-        {'GameWeek': 1, 'Test Score': 71, 'Test 2 Score': 71, 'Test 3 Score': 71, 'Test 4 Score': 71, 'Test 5 Score': 70}, 
-    ]
-    result = calculate_manager_points(test_score_data)
-
-    assert result ==  {'Test Score': 0.75, 'Test 2 Score': 0.75, 'Test 3 Score': 0.75, 'Test 4 Score': 0.75, 'Test 5 Score': 0}
-
-def test_calculate_manager_points_with_multiple_scores_draw_second_place():
-    test_score_data = [
-        {'GameWeek': 1, 'Test Score': 75, 'Test 2 Score': 71, 'Test 3 Score': 71, 'Test 4 Score': 71, 'Test 5 Score': 70}, 
-    ]
-    result = calculate_manager_points(test_score_data)
-
-    assert result ==  {'Test Score': 2, 'Test 2 Score': 0.33, 'Test 3 Score': 0.33, 'Test 4 Score': 0.33, 'Test 5 Score': 0}
+# def test_calculate_manager_points_with_multiple_scores_draw_first_place():
+#     test_score_data = [
+#         {'GameWeek': 1, 'Test Score': 71, 'Test 2 Score': 71, 'Test 3 Score': 71, 'Test 4 Score': 71, 'Test 5 Score': 70},
+#     ]
+#     result = calculate_manager_points(test_score_data)
+#
+#     assert result ==  {'Test Score': 0.75, 'Test 2 Score': 0.75, 'Test 3 Score': 0.75, 'Test 4 Score': 0.75, 'Test 5 Score': 0}
+#
+# def test_calculate_manager_points_with_multiple_scores_draw_second_place():
+#     test_score_data = [
+#         {'GameWeek': 1, 'Test Score': 75, 'Test 2 Score': 71, 'Test 3 Score': 71, 'Test 4 Score': 71, 'Test 5 Score': 70},
+#     ]
+#     result = calculate_manager_points(test_score_data)
+#
+#     assert result ==  {'Test Score': 2, 'Test 2 Score': 0.33, 'Test 3 Score': 0.33, 'Test 4 Score': 0.33, 'Test 5 Score': 0}
 
 def test_retrieve_manager_data(requests_mock):
     test_player = [{'name': 'Test', 'team_id': '111111'}]

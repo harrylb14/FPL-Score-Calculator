@@ -8,17 +8,17 @@ def test_index():
     assert response.status_code == 200
     assert 'Enter Group Name' in str(response.data)
 
-def test_view_scores_uni():
+def test_view_scores_fpl():
     tester = app.test_client()
-    response = tester.post('/scores', data = {'groupname': 'uni'}, follow_redirects = True)
+    response = tester.post('/scores', data = {'groupname': 'fpl'}, follow_redirects = True)
     assert response.status_code == 200
     assert 'JH Score' in str(response.data)
 
-def test_view_scores_ctl():
-    tester = app.test_client()
-    response = tester.post('/scores', data = {'groupname': 'ctl'}, follow_redirects = True)
-    assert response.status_code == 200
-    assert 'TomT Score' in str(response.data)
+# def test_view_scores_ctl():
+#     tester = app.test_client()
+#     response = tester.post('/scores', data = {'groupname': 'ctl'}, follow_redirects = True)
+#     assert response.status_code == 200
+#     assert 'TomT Score' in str(response.data)
 
 def test_incorrect_group_name_flash_message():
     tester = app.test_client()

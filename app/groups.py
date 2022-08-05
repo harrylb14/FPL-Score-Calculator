@@ -1,11 +1,11 @@
 groups = [
             {'groupname': 'fpl', 'managers':
                 [
-                    {'name': 'JH', 'team_id': '9926'},
-                    {'name': 'Harry', 'team_id': '1065929'},
-                    {'name': 'Balls', 'team_id': '357537'},
-                    {'name': 'Jack', 'team_id': '4166417'},
-                    {'name': 'Shick', 'team_id': '1273152'}
+                    {'name': 'JH', 'team_id': '51580'},
+                    {'name': 'Harry', 'team_id': '97871'},
+                    {'name': 'Balls', 'team_id': '195012'},
+                    {'name': 'Jack', 'team_id': '3174062'},
+                    {'name': 'Shick', 'team_id': '160690'}
                 ]
             },
 

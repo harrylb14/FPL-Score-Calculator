@@ -230,8 +230,12 @@ def calculate_manager_points(scores, winner_points=2.5, second_points=1.5, third
             third_place_points = 0
         else:
             winning_points = winner_points
-            second_place_points = second_points/number_of_second_place
-            third_place_points = third_points/number_of_third_place if number_of_second_place == 1 else 0
+            if number_of_second_place == 1:
+                second_place_points = second_points
+                third_place_points = third_points/number_of_third_place
+            else:
+                second_place_points = (second_points + third_points) / number_of_second_place
+                third_place_points = 0
 
         # if number_of_first_place > 1:
         #     winning_points = (winner_points + second_points)/number_of_first_place

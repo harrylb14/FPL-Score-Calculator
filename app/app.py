@@ -221,6 +221,7 @@ def calculate_manager_points(scores, winner_points=2.5, second_points=1.5, third
         third_place_score = list(score_distribution)[2] if len(list(score_distribution)) > 2 else 0
         number_of_third_place = score_distribution[third_place_score] if len(list(score_distribution)) > 2 else 0
 
+
         if number_of_first_place > 2:
             winning_points = (winner_points + second_points + third_points)/number_of_first_place
             second_place_points = third_place_points = 0

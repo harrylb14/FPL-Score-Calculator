@@ -335,5 +335,5 @@ def calculate_free_hit_score(gameweek, manager):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
     

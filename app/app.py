@@ -7,8 +7,8 @@ from collections import defaultdict, Counter
 import functools 
 import operator 
 import os
-from .groups import groups
-from .captains import captains
+from groups import groups
+from captains import captains
 
 
 app = Flask(__name__)

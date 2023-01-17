@@ -2,10 +2,10 @@ from flask import Flask, flash, redirect, render_template, \
      request, url_for
 import requests
 import numpy as np
-import collections 
+import collections
 from collections import defaultdict, Counter
-import functools 
-import operator 
+import functools
+import operator
 import os
 from groups import groups
 from captains import captains
@@ -18,21 +18,34 @@ live_scores_base_url = 'https://fantasy.premierleague.com/api/event'
 
 session = requests.session()
 
-def retrieve_manager_data(managers): 
+url = 'https://users.premierleague.com/accounts/login/'
+payload = {
+ 'password': os.environ['FPL_PASSWORD'],
+ 'login': 'hlingardbright@hotmail.com',
+ 'redirect_uri': 'https://fantasy.premierleague.com/a/login',
+ 'app': 'plfpl-web'
+}
+
+session.post(url, data=payload)
+
+headers = {'User-Agent': 'python-requests/2.25.1', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Cookie': 'datadome=6zM5MFNUhyQlKU3N-0S-p7eiYJ3fwRiI9OHMM-Za14~n9ZQd0vh_Um8LuQ14gD5wnycraXUsKjDNdoMi8Bxyi_gG_TzpmbhH_9omPy3qTMx8jqtif4P4If01dOLEfYA3'}
+
+
+def retrieve_manager_data(managers):
     for manager in managers:
         team_id = manager['team_id']
         url = f'{fpl_api_base_url}/{team_id}/history/'
-        r = session.get(url)
+        r = session.get(url, headers=headers)
         print(r.text)
         json = r.json()
         if json == 'The game is being updated.':
             return 'Updating'
-            
+
         data = json['current']
         chips = json['chips']
         manager['data'] = data
         manager['chips'] = chips
-    
+
     return managers
 
 
@@ -49,12 +62,12 @@ def retrieve_managers_scores_current_gameweek(managers, gameweek):
         player_list = current_gameweek_players['picks']
 
         # gets the live score of each player and adds it to the total, including their multipler
-        for player in player_list:     
+        for player in player_list:
             player_id = player['element']
             player_data = player_scores['elements'][player_id - 1]
             player_live_score = player_data['stats']['total_points']
             score += int(player['multiplier'])*player_live_score
-            
+
         live_scores[f'{name} Score'] = score - transfer_penalty
 
     return live_scores
@@ -69,7 +82,7 @@ def retrieve_manager_scores_previous_gameweeks(manager_data):
         for week in manager['data']:
             manager_score.append({'GameWeek': week['event'], f'{name} Score': (week['points'] - week['event_transfers_cost'])})
         manager_scores.append(manager_score)
-   
+
     return manager_scores
 
 
@@ -118,7 +131,7 @@ def retrieve_chip_information(manager_data):
 
             chip_information[chip_week - 1][f'{name} Score'] = chip_type
 
-    return chip_information 
+    return chip_information
 
 
 def retrieve_captain_information(manager_data):
@@ -156,7 +169,7 @@ def direct_to_scores():
     groupname = req.get("groupname").lower()
 
     #search groups for entered groupname
-    if not any(group['groupname'] == groupname for group in groups):    
+    if not any(group['groupname'] == groupname for group in groups):
         flash('No group with this name!', 'invalid group')
         return redirect(url_for('home'))
 
@@ -171,7 +184,7 @@ def display_all_scores(groupname):
 
     if manager_data == 'Updating':
         return render_template('updating.html')
-    else: 
+    else:
         manager_scores = retrieve_manager_scores_previous_gameweeks(manager_data)
         weekly_scores = group_manager_scores_by_week(manager_scores)
         chip_information = retrieve_chip_information(manager_data)
@@ -186,22 +199,22 @@ def display_all_scores(groupname):
         scorenames = colnames[1:]
         winnings = calculate_winnings(total_points, gameweek)
 
-    return render_template('full_scores.html', records=weekly_scores, captains=captains, chips=chip_information, colnames=colnames, 
-        scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings, 
+    return render_template('full_scores.html', records=weekly_scores, captains=captains, chips=chip_information, colnames=colnames,
+        scorenames=scorenames, totals=total_scores, points=total_points, winnings=winnings,
         groupname = groupname, live_scores = live_scores, gameweek = gameweek)
 
 
-# totals scores of each gameweek 
+# totals scores of each gameweek
 def calculate_total_scores(scores):
-    total_scores = dict(functools.reduce(operator.add, 
+    total_scores = dict(functools.reduce(operator.add,
          map(collections.Counter, scores)))
     del total_scores['GameWeek']
 
     return total_scores
 
-# manager points are allocated based on weekly performances. Winner_points are distributed 
-# amongst those in first place, and if there is only one winner, second place points 
-# are distributed amongst those in second place. 
+# manager points are allocated based on weekly performances. Winner_points are distributed
+# amongst those in first place, and if there is only one winner, second place points
+# are distributed amongst those in second place.
 
 
 def calculate_manager_points(scores, winner_points=2.5, second_points=1.5, third_points=1):
@@ -267,7 +280,7 @@ def calculate_manager_points(scores, winner_points=2.5, second_points=1.5, third
     return total_manager_points
 
 
-# winnings are calculated as number of manager points minus number of gameweeks passed 
+# winnings are calculated as number of manager points minus number of gameweeks passed
 def calculate_winnings(manager_points, number_of_weeks):
     winnings = {}
     for player, score in manager_points.items():
@@ -301,7 +314,7 @@ def calculate_captain_score(gameweek, manager, player_scores, player_data):
     team_id = manager['team_id']
     gameweek_players = session.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
     player_list = gameweek_players['picks']
-    for player in player_list: 
+    for player in player_list:
         if player['multiplier'] == 2 or player['multiplier'] == 3:
             captain_id = player['element']
             break
@@ -309,7 +322,7 @@ def calculate_captain_score(gameweek, manager, player_scores, player_data):
     captain_data = player_scores['elements'][captain_id - 1]
     captain_score = captain_data['stats']['total_points']
 
-    for captain in captains: 
+    for captain in captains:
         if captain_id == captain['id']:
             captain_name = captain['name']
             return [captain_name, captain_score]
@@ -322,7 +335,7 @@ def calculate_captain_score(gameweek, manager, player_scores, player_data):
 def calculate_free_hit_score(gameweek, manager):
     week_score = manager['data'][gameweek - 1]['points']
     team_id = manager['team_id']
-    score_no_free_hit = 0 
+    score_no_free_hit = 0
     original_team = session.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek - 1}/picks/').json()
     player_scores = session.get(f'{live_scores_base_url}/{gameweek}/live/').json()
     original_players = original_team['picks']

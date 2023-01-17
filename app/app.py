@@ -48,7 +48,8 @@ def create_session():
         "Access-Control-Allow-Origin": "*"
     }
 
-    session.post(url, data=payload, headers=headers)
+    r = session.post(url, data=payload, headers=headers)
+    session.cookies = r.history[0].cookies
     return session
 
 

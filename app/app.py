@@ -7,14 +7,34 @@ from collections import defaultdict, Counter
 import functools
 import operator
 import os
-from .groups import groups
-from .captains import captains
+from groups import groups
+from captains import captains
 
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 fpl_api_base_url = 'https://fantasy.premierleague.com/api/entry'
 live_scores_base_url = 'https://fantasy.premierleague.com/api/event'
+
+get_headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:108.0) Gecko/20100101 Firefox/108.0",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Host": "users.premierleague.com",
+        "Origin": "https://fantasy.premierleague.com",
+        "Referer": "https://fantasy.premierleague.com/",
+        "Sec-Fetch-Site": "same-site",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-User": "?1",
+        "Sec-Fetch-Dest": "document",
+        "Accept-Language": "en-GB,en,q=0.5",
+        "Upgrade-Insecure-Requests": "1",
+        "Connection": "keep-alive",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Origin": "*"
+}
 
 
 def create_session():

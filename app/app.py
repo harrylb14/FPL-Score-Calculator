@@ -23,7 +23,6 @@ payload = {
  'password': os.environ['FPL_PASSWORD'],
  'login': 'hlingardbright@hotmail.com',
  'redirect_uri': 'https://fantasy.premierleague.com/a/login',
- 'app': 'plfpl-web'
 }
 
 session.post(url, data=payload)

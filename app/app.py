@@ -28,7 +28,15 @@ payload = {
 
 session.post(url, data=payload)
 
-headers = {'User-Agent': 'python-requests/2.25.1', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'Cookie': 'datadome=6zM5MFNUhyQlKU3N-0S-p7eiYJ3fwRiI9OHMM-Za14~n9ZQd0vh_Um8LuQ14gD5wnycraXUsKjDNdoMi8Bxyi_gG_TzpmbhH_9omPy3qTMx8jqtif4P4If01dOLEfYA3'}
+headers = {
+    'User-Agent': 'python-requests/2.25.1',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept': '*/*',
+    'Connection': 'keep-alive',
+    "Access-Control-Allow-Methods": "*",
+    "Access-Control-Allow-Headers": "*",
+    "Access-Control-Allow-Origin": "*",
+}
 
 
 def retrieve_manager_data(managers):

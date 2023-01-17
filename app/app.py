@@ -7,8 +7,8 @@ from collections import defaultdict, Counter
 import functools 
 import operator 
 import os
-from groups import groups
-from captains import captains
+from app.groups import groups
+from app.captains import captains
 
 
 app = Flask(__name__)
@@ -22,6 +22,7 @@ def retrieve_manager_data(managers):
         team_id = manager['team_id']
         url = f'{fpl_api_base_url}/{team_id}/history/'
         r = requests.get(url)
+        print(r)
         json = r.json()
         if json == 'The game is being updated.':
             return 'Updating'

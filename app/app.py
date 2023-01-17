@@ -16,12 +16,13 @@ app.secret_key = os.urandom(24)
 fpl_api_base_url = 'https://fantasy.premierleague.com/api/entry'
 live_scores_base_url = 'https://fantasy.premierleague.com/api/event'
 
+session = requests.session()
 
 def retrieve_manager_data(managers): 
     for manager in managers:
         team_id = manager['team_id']
         url = f'{fpl_api_base_url}/{team_id}/history/'
-        r = requests.get(url)
+        r = session.get(url)
         print(r.text)
         json = r.json()
         if json == 'The game is being updated.':
@@ -37,13 +38,13 @@ def retrieve_manager_data(managers):
 
 def retrieve_managers_scores_current_gameweek(managers, gameweek):
     live_scores = {}
-    player_scores = requests.get(f'{live_scores_base_url}/{gameweek}/live/').json()
+    player_scores = session.get(f'{live_scores_base_url}/{gameweek}/live/').json()
     # retrieves the list of players owned by a manager in a given gameweek
     for manager in managers:
         score = 0
         team_id = manager['team_id']
         name = manager['name']
-        current_gameweek_players = requests.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
+        current_gameweek_players = session.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
         transfer_penalty = current_gameweek_players['entry_history']['event_transfers_cost']
         player_list = current_gameweek_players['picks']
 
@@ -87,7 +88,7 @@ def group_manager_scores_by_week(manager_scores):
 def retrieve_chip_information(manager_data):
     chip_information = []
     gameweeks_passed = len(manager_data[0]['data'])
-    player_data = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
+    player_data = session.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
     for week in range(1,gameweeks_passed+1):
         week_chips={}
         for manager in manager_data:
@@ -102,7 +103,7 @@ def retrieve_chip_information(manager_data):
         for chip in chips:
             chip_week = chip['event']
             chip_type = chip['name']
-            player_scores = requests.get(f'{live_scores_base_url}/{chip_week}/live/').json()
+            player_scores = session.get(f'{live_scores_base_url}/{chip_week}/live/').json()
             if chip_type == 'wildcard':
                 chip_type = 'Wildcard'
             elif chip_type == 'bboost':
@@ -122,9 +123,9 @@ def retrieve_chip_information(manager_data):
 
 def retrieve_captain_information(manager_data):
     captain_information = []
-    player_data = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
+    player_data = session.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
     for week in range(1, len(manager_data[0]['data']) + 1):
-        player_scores = requests.get(f'{live_scores_base_url}/{week}/live/').json()
+        player_scores = session.get(f'{live_scores_base_url}/{week}/live/').json()
         week_captains = {}
         for manager in manager_data:
             name = manager['name']
@@ -283,9 +284,9 @@ def calculate_winnings(manager_points, number_of_weeks):
 
 
 def calculate_bench_boost_score(gameweek, manager):
-    player_scores = requests.get(f'{live_scores_base_url}/{gameweek}/live/').json()
+    player_scores = session.get(f'{live_scores_base_url}/{gameweek}/live/').json()
     team_id = manager['team_id']
-    gameweek_players = requests.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
+    gameweek_players = session.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
     player_list = gameweek_players['picks']
     bench_score = 0
     for player in player_list[11:]:
@@ -298,7 +299,7 @@ def calculate_bench_boost_score(gameweek, manager):
 
 def calculate_captain_score(gameweek, manager, player_scores, player_data):
     team_id = manager['team_id']
-    gameweek_players = requests.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
+    gameweek_players = session.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
     player_list = gameweek_players['picks']
     for player in player_list: 
         if player['multiplier'] == 2 or player['multiplier'] == 3:
@@ -322,8 +323,8 @@ def calculate_free_hit_score(gameweek, manager):
     week_score = manager['data'][gameweek - 1]['points']
     team_id = manager['team_id']
     score_no_free_hit = 0 
-    original_team = requests.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek - 1}/picks/').json()
-    player_scores = requests.get(f'{live_scores_base_url}/{gameweek}/live/').json()
+    original_team = session.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek - 1}/picks/').json()
+    player_scores = session.get(f'{live_scores_base_url}/{gameweek}/live/').json()
     original_players = original_team['picks']
 
     for player in original_players:     

@@ -7,8 +7,8 @@ from collections import defaultdict, Counter
 import functools
 import operator
 import os
-from app.groups import groups
-from app.captains import captains
+from .groups import groups
+from .captains import captains
 
 
 app = Flask(__name__)
@@ -16,47 +16,48 @@ app.secret_key = os.urandom(24)
 fpl_api_base_url = 'https://fantasy.premierleague.com/api/entry'
 live_scores_base_url = 'https://fantasy.premierleague.com/api/event'
 
-session = requests.session()
 
-url = 'https://users.premierleague.com/accounts/login/'
-payload = {
-    'password': os.environ['FPL_PASSWORD'],
-    'login': 'hlingardbright@hotmail.com',
-    'redirect_uri': 'https://fantasy.premierleague.com/',
-    'app': 'plfpl-web'
-}
+def create_session():
+    session = requests.session()
+
+    url = "https://users.premierleague.com/accounts/login/"
+    payload = {
+        "password": os.environ['FPL_PASSWORD'],
+        "login": "hlingardbright@hotmail.com",
+        "redirect_uri": "https://fantasy.premierleague.com/",
+        "app": "plfpl-web"
+    }
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:108.0) Gecko/20100101 Firefox/108.0",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Host": "users.premierleague.com",
+        "Origin": "https://fantasy.premierleague.com",
+        "Referer": "https://fantasy.premierleague.com/",
+        "Sec-Fetch-Site": "same-site",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-User": "?1",
+        "Sec-Fetch-Dest": "document",
+        "Accept-Language": "en-GB,en,q=0.5",
+        "Upgrade-Insecure-Requests": "1",
+        "Connection": "keep-alive",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Origin": "*"
+    }
+
+    session.post(url, data=payload, headers=headers)
+    return session
 
 
-
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:108.0) Gecko/20100101 Firefox/108.0',
-    'Accept-Encoding': 'gzip, deflate, br',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-    'Content-Type': 'application/x-www-form-urlencoded',
-    'Host': 'users.premierleague.com',
-    'Origin': 'https://fantasy.premierleague.com',
-    'Referer': 'https://fantasy.premierleague.com/',
-    'Sec-Fetch-Site': 'same-site',
-    'Sec-Fetch-Mode': 'navigate',
-    'Sec-Fetch-User': '?1',
-    'Sec-Fetch-Dest': 'document',
-    "Accept-Language": 'en-GB,en,q=0.5',
-    'Upgrade-Insecure-Requests': '1',
-    'Connection': 'keep-alive',
-    "Access-Control-Allow-Methods": "*",
-    "Access-Control-Allow-Headers": "*",
-    "Access-Control-Allow-Origin": "*",
-}
-
-session.post(url, data=payload, headers=headers)
-
-
-def retrieve_manager_data(managers):
+def retrieve_manager_data(managers, session):
+    app.logger.info(f"this is a manger log {managers}")
     for manager in managers:
         team_id = manager['team_id']
         url = f'{fpl_api_base_url}/{team_id}/history/'
-        r = session.get(url, headers=headers)
-        print(r.text)
+        r = session.get(url)
         json = r.json()
         if json == 'The game is being updated.':
             return 'Updating'
@@ -69,7 +70,7 @@ def retrieve_manager_data(managers):
     return managers
 
 
-def retrieve_managers_scores_current_gameweek(managers, gameweek):
+def retrieve_managers_scores_current_gameweek(managers, gameweek, session):
     live_scores = {}
     player_scores = session.get(f'{live_scores_base_url}/{gameweek}/live/').json()
     # retrieves the list of players owned by a manager in a given gameweek
@@ -118,7 +119,7 @@ def group_manager_scores_by_week(manager_scores):
     return scores_grouped_by_week
 
 
-def retrieve_chip_information(manager_data):
+def retrieve_chip_information(manager_data, session):
     chip_information = []
     gameweeks_passed = len(manager_data[0]['data'])
     player_data = session.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
@@ -140,13 +141,13 @@ def retrieve_chip_information(manager_data):
             if chip_type == 'wildcard':
                 chip_type = 'Wildcard'
             elif chip_type == 'bboost':
-                score = calculate_bench_boost_score(chip_week, manager)
+                score = calculate_bench_boost_score(chip_week, manager, session)
                 chip_type = f'Bench Boost: {score}'
             elif chip_type == '3xc':
-                score = calculate_captain_score(chip_week, manager, player_scores, player_data)
+                score = calculate_captain_score(chip_week, manager, player_scores, player_data, session)
                 chip_type = f'Triple Captain {score[0]}: {score[1] * 3}'
             elif chip_type == 'freehit':
-                score = calculate_free_hit_score(chip_week, manager)
+                score = calculate_free_hit_score(chip_week, manager, session)
                 chip_type = f'Free Hit: {score}'
 
             chip_information[chip_week - 1][f'{name} Score'] = chip_type
@@ -154,7 +155,7 @@ def retrieve_chip_information(manager_data):
     return chip_information
 
 
-def retrieve_captain_information(manager_data):
+def retrieve_captain_information(manager_data, session):
     captain_information = []
     player_data = session.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
     for week in range(1, len(manager_data[0]['data']) + 1):
@@ -162,7 +163,7 @@ def retrieve_captain_information(manager_data):
         week_captains = {}
         for manager in manager_data:
             name = manager['name']
-            captain = calculate_captain_score(week, manager, player_scores, player_data)
+            captain = calculate_captain_score(week, manager, player_scores, player_data, session)
             captain_name = captain[0]
             captain_score = captain[1]
             captain_string = f'{captain_name}: {captain_score}'
@@ -189,6 +190,7 @@ def direct_to_scores():
     groupname = req.get("groupname").lower()
 
     #search groups for entered groupname
+    app.logger.info(f"this is a manger log {groups} {groupname}")
     if not any(group['groupname'] == groupname for group in groups):
         flash('No group with this name!', 'invalid group')
         return redirect(url_for('home'))
@@ -198,19 +200,20 @@ def direct_to_scores():
 
 @app.route("/scores/<groupname>", methods=['GET', 'POST', 'PUT'])
 def display_all_scores(groupname):
+    session = create_session()
     group = next(group for group in groups if group["groupname"] == groupname)
     manager_list = group['managers']
-    manager_data = retrieve_manager_data(manager_list)
+    manager_data = retrieve_manager_data(manager_list, session)
 
     if manager_data == 'Updating':
         return render_template('updating.html')
     else:
         manager_scores = retrieve_manager_scores_previous_gameweeks(manager_data)
         weekly_scores = group_manager_scores_by_week(manager_scores)
-        chip_information = retrieve_chip_information(manager_data)
-        captains = retrieve_captain_information(manager_data)
+        chip_information = retrieve_chip_information(manager_data, session)
+        captains = retrieve_captain_information(manager_data, session)
         gameweek = len(weekly_scores)
-        live_scores = retrieve_managers_scores_current_gameweek(manager_list, gameweek)
+        live_scores = retrieve_managers_scores_current_gameweek(manager_list, gameweek, session)
         weekly_scores[-1] = live_scores
         total_scores = calculate_total_scores(weekly_scores)
         total_points = calculate_manager_points(weekly_scores)
@@ -316,7 +319,7 @@ def calculate_winnings(manager_points, number_of_weeks):
     return dict(winnings)
 
 
-def calculate_bench_boost_score(gameweek, manager):
+def calculate_bench_boost_score(gameweek, manager, session):
     player_scores = session.get(f'{live_scores_base_url}/{gameweek}/live/').json()
     team_id = manager['team_id']
     gameweek_players = session.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
@@ -330,7 +333,7 @@ def calculate_bench_boost_score(gameweek, manager):
     return bench_score
 
 
-def calculate_captain_score(gameweek, manager, player_scores, player_data):
+def calculate_captain_score(gameweek, manager, player_scores, player_data, session):
     team_id = manager['team_id']
     gameweek_players = session.get(f'{fpl_api_base_url}/{team_id}/event/{gameweek}/picks/').json()
     player_list = gameweek_players['picks']
@@ -352,7 +355,7 @@ def calculate_captain_score(gameweek, manager, player_scores, player_data):
     return [captain['web_name'], captain_score]
 
 
-def calculate_free_hit_score(gameweek, manager):
+def calculate_free_hit_score(gameweek, manager, session):
     week_score = manager['data'][gameweek - 1]['points']
     team_id = manager['team_id']
     score_no_free_hit = 0
@@ -371,4 +374,3 @@ def calculate_free_hit_score(gameweek, manager):
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True)
-    

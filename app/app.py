@@ -7,8 +7,8 @@ from collections import defaultdict, Counter
 import functools
 import operator
 import os
-from groups import groups
-from captains import captains
+from app.groups import groups
+from app.captains import captains
 
 
 app = Flask(__name__)
@@ -29,7 +29,7 @@ session.post(url, data=payload)
 
 headers = {
     'User-Agent': 'python-requests/2.25.1',
-    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Encoding': 'gzip, deflate, br',
     'Accept': '*/*',
     'Connection': 'keep-alive',
     "Access-Control-Allow-Methods": "*",
